@@ -2,11 +2,13 @@
 Story Evolution Sandbox - Backend API (FastAPI)
 """
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
+from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
+from services.video_export import VideoExportService, VideoBlueprint
 
 load_dotenv()
 
@@ -125,25 +127,104 @@ def get_finalists(n: int = Query(default=3, ge=1, le=10)):
         }
     ]
 
+class VideoExportRequest(BaseModel):
+    """Request model for video export"""
+    story_id: str
+    title: str
+    script: str
+    target_length_seconds: int = 60
+    visual_style: str = "TikTok vertical drama"
+    aspect_ratio: str = "9:16"
+
+
+class ExportFormatRequest(BaseModel):
+    """Request model for specific export formats"""
+    story_id: str
+    title: str
+    script: str
+    target_length_seconds: int = 60
+    visual_style: str = "TikTok vertical drama"
+    aspect_ratio: str = "9:16"
+    format: str = "runway"  # runway, pika, sora, or blueprint
+
+
 @app.post("/api/export-video")
-def export_video(story_id: str):
+async def export_video(request: VideoExportRequest):
     """
-    Generate video blueprint for a story
+    Generate intelligent video blueprint for a story using Claude AI
 
     Args:
-        story_id: ID of the story to export
+        request: VideoExportRequest with story details
 
     Returns:
-        Video blueprint with beat sheet and metadata
+        Video blueprint with AI-generated beat sheet, character analysis, and metadata
     """
-    # TODO: Implement video export logic
-    return {
-        "story_id": story_id,
-        "title": "Story Title",
-        "target_length_seconds": 60,
-        "visual_style": "cinematic",
-        "beat_sheet": []
-    }
+    try:
+        # Initialize video export service
+        service = VideoExportService()
+
+        # Generate comprehensive video blueprint
+        blueprint = service.generate_video_blueprint(
+            story_id=request.story_id,
+            title=request.title,
+            script=request.script,
+            target_length_seconds=request.target_length_seconds,
+            visual_style=request.visual_style,
+            aspect_ratio=request.aspect_ratio
+        )
+
+        return blueprint.model_dump()
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating video blueprint: {str(e)}")
+
+
+@app.post("/api/export-video/format")
+async def export_video_format(request: ExportFormatRequest):
+    """
+    Export video blueprint in specific format (Runway, Pika, Sora)
+
+    Args:
+        request: ExportFormatRequest with story details and desired format
+
+    Returns:
+        Formatted export for the specified video generation platform
+    """
+    try:
+        service = VideoExportService()
+
+        # Generate blueprint first
+        blueprint = service.generate_video_blueprint(
+            story_id=request.story_id,
+            title=request.title,
+            script=request.script,
+            target_length_seconds=request.target_length_seconds,
+            visual_style=request.visual_style,
+            aspect_ratio=request.aspect_ratio
+        )
+
+        # Format for specific platform
+        format_lower = request.format.lower()
+        if format_lower == "runway":
+            return service.export_for_runway(blueprint)
+        elif format_lower == "pika":
+            return service.export_for_pika(blueprint)
+        elif format_lower == "sora":
+            return {"prompt": service.export_for_sora(blueprint)}
+        elif format_lower == "blueprint":
+            return blueprint.model_dump()
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Unknown format: {request.format}. Use 'runway', 'pika', 'sora', or 'blueprint'"
+            )
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error exporting video: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn

@@ -58,6 +58,8 @@ export interface VideoBeatSheet {
   characters: string[];
   emotion: string;
   visual_cues: string;
+  camera_angle?: string;
+  duration_seconds?: number;
 }
 
 export interface VideoBlueprint {
@@ -65,5 +67,21 @@ export interface VideoBlueprint {
   title: string;
   target_length_seconds: number;
   visual_style: string;
+  aspect_ratio: string;
   beat_sheet: VideoBeatSheet[];
+  characters: string[];
+  overall_mood: string;
+  color_palette?: string;
+  music_suggestion?: string;
 }
+
+export interface VideoExportRequest {
+  story_id: string;
+  title: string;
+  script: string;
+  target_length_seconds: number;
+  visual_style: string;
+  aspect_ratio: string;
+}
+
+export type ExportFormat = 'blueprint' | 'runway' | 'pika' | 'sora';

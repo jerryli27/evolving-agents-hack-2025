@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { Finalist, VideoBlueprint, VideoBeatSheet } from '@/types';
+import { useState, useEffect } from 'react';
+import { Finalist, VideoBlueprint, ExportFormat } from '@/types';
+import { generateVideoBlueprint, exportVideoFormat } from '@/lib/api';
 
 interface ExportVideoModalProps {
   finalist: Finalist;
@@ -11,97 +12,109 @@ interface ExportVideoModalProps {
 export default function ExportVideoModal({ finalist, onClose }: ExportVideoModalProps) {
   const [videoLength, setVideoLength] = useState<number>(60);
   const [visualStyle, setVisualStyle] = useState<string>('TikTok vertical drama');
-  const [copied, setCopied] = useState<'json' | 'text' | null>(null);
+  const [aspectRatio, setAspectRatio] = useState<string>('9:16');
+  const [blueprint, setBlueprint] = useState<VideoBlueprint | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+  const [exportFormat, setExportFormat] = useState<ExportFormat>('blueprint');
 
-  // Generate a simple beat sheet from the script
-  const generateBeatSheet = (): VideoBeatSheet[] => {
-    const script = finalist.story.full_script;
-    const scenes = script.split('\n\n').filter(s => s.trim().length > 0);
+  // Generate blueprint on mount or when settings change
+  useEffect(() => {
+    generateBlueprint();
+  }, [videoLength, visualStyle, aspectRatio]);
 
-    // Create 3-5 key beats from the script
-    const numBeats = Math.min(5, Math.max(3, Math.ceil(scenes.length / 2)));
-    const beatSheet: VideoBeatSheet[] = [];
+  const generateBlueprint = async () => {
+    setLoading(true);
+    setError(null);
 
-    for (let i = 0; i < numBeats; i++) {
-      const sceneIndex = Math.floor((i * scenes.length) / numBeats);
-      const scene = scenes[sceneIndex] || scenes[0];
-
-      // Extract simple description from scene
-      const description = scene.substring(0, 100).trim() + '...';
-
-      beatSheet.push({
-        scene_number: i + 1,
-        description: description.replace(/\n/g, ' '),
-        characters: ['Main Character'], // Simplified
-        emotion: i === 0 ? 'mysterious' : i === numBeats - 1 ? 'dramatic' : 'tense',
-        visual_cues: i === 0 ? 'Dark, moody lighting' : i === numBeats - 1 ? 'Climactic reveal' : 'Medium close-up',
+    try {
+      const result = await generateVideoBlueprint({
+        story_id: finalist.story.story_id,
+        title: finalist.story.title,
+        script: finalist.story.full_script,
+        target_length_seconds: videoLength,
+        visual_style: visualStyle,
+        aspect_ratio: aspectRatio,
       });
+
+      setBlueprint(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to generate video blueprint');
+      console.error('Blueprint generation error:', err);
+    } finally {
+      setLoading(false);
     }
-
-    return beatSheet;
-  };
-
-  const beatSheet = generateBeatSheet();
-
-  const videoBlueprint: VideoBlueprint = {
-    story_id: finalist.story.story_id,
-    title: finalist.story.title,
-    target_length_seconds: videoLength,
-    visual_style: visualStyle,
-    beat_sheet: beatSheet,
   };
 
   const handleCopyJSON = () => {
-    const json = JSON.stringify(videoBlueprint, null, 2);
+    if (!blueprint) return;
+    const json = JSON.stringify(blueprint, null, 2);
     navigator.clipboard.writeText(json);
     setCopied('json');
     setTimeout(() => setCopied(null), 2000);
   };
 
-  const handleCopyText = () => {
-    const textPrompt = `
-VIDEO PROMPT FOR AI GENERATION
-===============================
+  const handleCopyFormat = async (format: ExportFormat) => {
+    if (!blueprint) return;
 
-Title: ${finalist.story.title}
-Duration: ${videoLength} seconds
-Visual Style: ${visualStyle}
+    try {
+      const result = await exportVideoFormat({
+        story_id: finalist.story.story_id,
+        title: finalist.story.title,
+        script: finalist.story.full_script,
+        target_length_seconds: videoLength,
+        visual_style: visualStyle,
+        aspect_ratio: aspectRatio,
+        format: format,
+      });
 
-STORY LOGLINE:
-${finalist.story.logline}
+      const textToCopy = format === 'sora'
+        ? result.prompt
+        : JSON.stringify(result, null, 2);
 
-BEAT SHEET:
-${beatSheet.map(beat => `
-Scene ${beat.scene_number}:
-- Description: ${beat.description}
-- Characters: ${beat.characters.join(', ')}
-- Emotion: ${beat.emotion}
-- Visual: ${beat.visual_cues}
-`).join('\n')}
-
-FULL SCRIPT:
-${finalist.story.full_script}
-    `.trim();
-
-    navigator.clipboard.writeText(textPrompt);
-    setCopied('text');
-    setTimeout(() => setCopied(null), 2000);
+      navigator.clipboard.writeText(textToCopy);
+      setCopied(format);
+      setTimeout(() => setCopied(null), 2000);
+    } catch (err) {
+      console.error(`Error exporting ${format} format:`, err);
+    }
   };
+
+  const visualStyles = [
+    'TikTok vertical drama',
+    'Cinematic widescreen',
+    'Film noir aesthetic',
+    'Romantic soft lighting',
+    'Sci-fi futuristic',
+    'Documentary realism',
+    'Anime style',
+    'Horror atmosphere',
+  ];
+
+  const aspectRatios = [
+    { value: '9:16', label: '9:16 (TikTok/Reels)' },
+    { value: '16:9', label: '16:9 (YouTube/Landscape)' },
+    { value: '1:1', label: '1:1 (Square)' },
+    { value: '4:5', label: '4:5 (Instagram)' },
+  ];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-gray-50 border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-7xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700 flex justify-between items-start">
+        <div className="border-b-2 border-black bg-black px-6 py-3 flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Export to Video</h2>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h2 className="text-lg font-bold uppercase tracking-wider text-white">
+              AI Video Export
+            </h2>
+            <p className="text-xs text-white opacity-70 font-mono">
               {finalist.story.title} by {finalist.writer.name}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
+            className="text-white hover:text-gray-300 text-2xl font-bold"
           >
             ×
           </button>
@@ -109,106 +122,211 @@ ${finalist.story.full_script}
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left: Script */}
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Full Script</h3>
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg h-[500px] overflow-y-auto border border-gray-200 dark:border-gray-700">
-                <pre className="font-mono text-sm whitespace-pre-wrap">
-                  {finalist.story.full_script}
-                </pre>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Controls */}
+            <div className="space-y-4">
+              <div className="bg-white border-2 border-black p-4">
+                <h3 className="text-sm font-bold uppercase tracking-wide mb-4 text-black">
+                  Settings
+                </h3>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wide mb-2 text-black">
+                      Duration
+                    </label>
+                    <select
+                      value={videoLength}
+                      onChange={(e) => setVideoLength(Number(e.target.value))}
+                      className="w-full p-2 border-2 border-black font-mono text-sm"
+                      disabled={loading}
+                    >
+                      <option value={30}>30 seconds</option>
+                      <option value={60}>60 seconds</option>
+                      <option value={90}>90 seconds</option>
+                      <option value={120}>2 minutes</option>
+                      <option value={180}>3 minutes</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wide mb-2 text-black">
+                      Visual Style
+                    </label>
+                    <select
+                      value={visualStyle}
+                      onChange={(e) => setVisualStyle(e.target.value)}
+                      className="w-full p-2 border-2 border-black font-mono text-sm"
+                      disabled={loading}
+                    >
+                      {visualStyles.map(style => (
+                        <option key={style} value={style}>{style}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wide mb-2 text-black">
+                      Aspect Ratio
+                    </label>
+                    <select
+                      value={aspectRatio}
+                      onChange={(e) => setAspectRatio(e.target.value)}
+                      className="w-full p-2 border-2 border-black font-mono text-sm"
+                      disabled={loading}
+                    >
+                      {aspectRatios.map(ar => (
+                        <option key={ar.value} value={ar.value}>{ar.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
               </div>
+
+              {/* Blueprint Metadata */}
+              {blueprint && !loading && (
+                <div className="bg-white border-2 border-black p-4">
+                  <h3 className="text-sm font-bold uppercase tracking-wide mb-3 text-black">
+                    AI Analysis
+                  </h3>
+                  <div className="space-y-3 text-sm font-mono">
+                    <div>
+                      <div className="text-xs uppercase text-black opacity-60 mb-1">Characters</div>
+                      <div className="text-black">{blueprint.characters.join(', ')}</div>
+                    </div>
+                    <div>
+                      <div className="text-xs uppercase text-black opacity-60 mb-1">Overall Mood</div>
+                      <div className="text-black">{blueprint.overall_mood}</div>
+                    </div>
+                    {blueprint.color_palette && (
+                      <div>
+                        <div className="text-xs uppercase text-black opacity-60 mb-1">Color Palette</div>
+                        <div className="text-black">{blueprint.color_palette}</div>
+                      </div>
+                    )}
+                    {blueprint.music_suggestion && (
+                      <div>
+                        <div className="text-xs uppercase text-black opacity-60 mb-1">Music</div>
+                        <div className="text-black">{blueprint.music_suggestion}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Right: Video Blueprint */}
-            <div>
-              <h3 className="text-lg font-semibold mb-3">Video Blueprint</h3>
-
-              <div className="space-y-4 mb-4">
-                {/* Controls */}
-                <div>
-                  <label className="block text-sm font-medium mb-1">Target Length</label>
-                  <select
-                    value={videoLength}
-                    onChange={(e) => setVideoLength(Number(e.target.value))}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800"
-                  >
-                    <option value={30}>30 seconds</option>
-                    <option value={60}>60 seconds</option>
-                    <option value={90}>90 seconds</option>
-                    <option value={120}>120 seconds</option>
-                  </select>
+            {/* Middle Column: Beat Sheet */}
+            <div className="lg:col-span-2">
+              {loading && (
+                <div className="bg-white border-2 border-black p-8 text-center">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-black border-t-transparent mb-4"></div>
+                  <div className="text-sm font-mono text-black">Generating AI-powered beat sheet...</div>
                 </div>
+              )}
 
-                <div>
-                  <label className="block text-sm font-medium mb-1">Visual Style</label>
-                  <select
-                    value={visualStyle}
-                    onChange={(e) => setVisualStyle(e.target.value)}
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800"
-                  >
-                    <option>TikTok vertical drama</option>
-                    <option>Cinematic widescreen</option>
-                    <option>Film noir aesthetic</option>
-                    <option>Romantic soft lighting</option>
-                    <option>Sci-fi futuristic</option>
-                    <option>Documentary realism</option>
-                  </select>
+              {error && (
+                <div className="bg-white border-2 border-black p-4 text-red-600 text-sm font-mono">
+                  Error: {error}
                 </div>
-              </div>
+              )}
 
-              {/* Beat Sheet */}
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 max-h-[350px] overflow-y-auto">
-                <h4 className="font-semibold mb-3">Auto-generated Beat Sheet</h4>
-                <div className="space-y-3">
-                  {beatSheet.map((beat) => (
-                    <div
-                      key={beat.scene_number}
-                      className="bg-white dark:bg-gray-900 p-3 rounded border border-gray-200 dark:border-gray-700"
-                    >
-                      <div className="font-semibold mb-1">Scene {beat.scene_number}</div>
-                      <div className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                        {beat.description}
+              {blueprint && !loading && (
+                <div className="bg-white border-2 border-black">
+                  <div className="border-b-2 border-black bg-black px-4 py-2">
+                    <h3 className="text-sm font-bold uppercase tracking-wide text-white">
+                      Beat Sheet ({blueprint.beat_sheet.length} scenes)
+                    </h3>
+                  </div>
+
+                  <div className="p-4 max-h-[500px] overflow-y-auto space-y-3">
+                    {blueprint.beat_sheet.map((beat) => (
+                      <div
+                        key={beat.scene_number}
+                        className="border-2 border-black p-3 bg-gray-50"
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="font-bold text-sm text-black">
+                            SCENE {beat.scene_number}
+                            {beat.duration_seconds && (
+                              <span className="ml-2 text-xs opacity-60">
+                                ({beat.duration_seconds}s)
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-xs px-2 py-1 bg-black text-white font-mono uppercase">
+                            {beat.emotion}
+                          </div>
+                        </div>
+
+                        <div className="text-sm text-black mb-3 leading-relaxed">
+                          {beat.description}
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                          <div>
+                            <div className="uppercase text-black opacity-60 mb-1">Characters</div>
+                            <div className="text-black">{beat.characters.join(', ')}</div>
+                          </div>
+                          {beat.camera_angle && (
+                            <div>
+                              <div className="uppercase text-black opacity-60 mb-1">Camera</div>
+                              <div className="text-black">{beat.camera_angle}</div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="mt-2 text-xs">
+                          <div className="uppercase text-black opacity-60 mb-1">Visual Direction</div>
+                          <div className="text-black font-mono">{beat.visual_cues}</div>
+                        </div>
                       </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
-                        <div>
-                          <strong>Characters:</strong> {beat.characters.join(', ')}
-                        </div>
-                        <div>
-                          <strong>Emotion:</strong> {beat.emotion}
-                        </div>
-                        <div>
-                          <strong>Visual:</strong> {beat.visual_cues}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="p-6 border-t border-gray-200 dark:border-gray-700 flex gap-3">
-          <button
-            onClick={handleCopyJSON}
-            className="flex-1 py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-          >
-            {copied === 'json' ? '✓ Copied!' : 'Copy JSON for Video Model'}
-          </button>
-          <button
-            onClick={handleCopyText}
-            className="flex-1 py-3 px-6 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
-          >
-            {copied === 'text' ? '✓ Copied!' : 'Copy Text Prompt'}
-          </button>
-          <button
-            onClick={onClose}
-            className="py-3 px-6 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg font-medium transition-colors"
-          >
-            Close
-          </button>
+        {/* Footer - Export Actions */}
+        <div className="border-t-2 border-black bg-white p-4">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleCopyJSON}
+              disabled={!blueprint || loading}
+              className="flex-1 min-w-[150px] py-3 px-4 bg-black text-white border-2 border-black hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-xs uppercase tracking-wide transition-all hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+            >
+              {copied === 'json' ? '✓ COPIED!' : '📋 JSON'}
+            </button>
+
+            <button
+              onClick={() => handleCopyFormat('runway')}
+              disabled={!blueprint || loading}
+              className="flex-1 min-w-[150px] py-3 px-4 bg-white text-black border-2 border-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-xs uppercase tracking-wide transition-all hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+            >
+              {copied === 'runway' ? '✓ COPIED!' : '🎬 RUNWAY'}
+            </button>
+
+            <button
+              onClick={() => handleCopyFormat('pika')}
+              disabled={!blueprint || loading}
+              className="flex-1 min-w-[150px] py-3 px-4 bg-white text-black border-2 border-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-xs uppercase tracking-wide transition-all hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+            >
+              {copied === 'pika' ? '✓ COPIED!' : '⚡ PIKA'}
+            </button>
+
+            <button
+              onClick={() => handleCopyFormat('sora')}
+              disabled={!blueprint || loading}
+              className="flex-1 min-w-[150px] py-3 px-4 bg-white text-black border-2 border-black hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-xs uppercase tracking-wide transition-all hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+            >
+              {copied === 'sora' ? '✓ COPIED!' : '🎥 SORA'}
+            </button>
+          </div>
+
+          <div className="mt-3 text-xs text-black opacity-60 text-center font-mono">
+            Beat sheet generated by Claude AI • Export to your preferred video platform
+          </div>
         </div>
       </div>
     </div>
