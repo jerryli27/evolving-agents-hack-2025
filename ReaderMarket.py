@@ -17,6 +17,8 @@ class ReaderMarket():
                     print(f"The following agent has been added as a reader: {agent.scratch}")
                 except:
                     print(f"Not a valid agent path: {f}")
+        print(f"{len(self.reader_agents)} reader agents have been added. ")
+        print("----------")
 
 
     def get_reader_feedback(self, title: str, full_story: str, short_summary: str, timestep, price = 0.0):
@@ -73,7 +75,7 @@ class ReaderMarket():
             print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} has the following open-ended feedback on book {title}: {'\n'.join(open_ended_response)}")
             individual_feedback = {
                 'reader_agent': agent,
-                'total_score' : (quality_score + novelty_score + relevance_score) / 3.0,
+                'total_score' : quality_score * quality_weight + novelty_score * novelty_weight + relevance_score * relevance_weight,
                 'novelty' : novelty_score,
                 'relevance' : relevance_score,
                 'quality' : quality_score,
