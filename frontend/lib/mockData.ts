@@ -93,13 +93,18 @@ function generateStory(writerId: string, round: number): Story {
   };
 
   const composite = baseScores[writerId][round - 1];
-  const variance = Math.random() * 10 - 5; // -5 to +5 variance
+
+  // Deterministic variance based on writer and round (no Math.random to avoid hydration issues)
+  const writerNum = parseInt(writerId.split('_')[1]);
+  const variance = ((writerNum * round * 7) % 10) - 5; // Deterministic -5 to +5
+  const noveltyVar = ((writerNum * round * 13) % 20) - 10; // Deterministic -10 to +10
+  const coherenceVar = ((writerNum * round * 11) % 10) - 5; // Deterministic -5 to +5
 
   const score = {
     composite,
     reader_alignment: Math.min(100, Math.max(0, composite + variance)),
-    novelty: Math.min(100, Math.max(0, composite + (Math.random() * 20 - 10))),
-    coherence: Math.min(100, Math.max(0, composite + (Math.random() * 10 - 5))),
+    novelty: Math.min(100, Math.max(0, composite + noveltyVar)),
+    coherence: Math.min(100, Math.max(0, composite + coherenceVar)),
   };
 
   // Get the appropriate script content
