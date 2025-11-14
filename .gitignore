@@ -187,3 +187,6 @@ node_modules/
 
 # Ignore .cursorignore
 .cursorignore
+
+# API key settings
+simulation_engine/settings.py
