@@ -34,6 +34,10 @@ class WriterConfig(BaseModel):
     system_prompt: str = ""
     # Optional: Path to a markdown file containing additional prompt instructions
     prompt_file: Optional[str] = None
+    # Optional: Path to a markdown file with feedback incorporation framework
+    feedback_prompt_file: Optional[str] = None
+    # Optional: Enable/disable the feedback incorporation tool
+    enable_feedback_tool: bool = True
     # Optional: control which past writings the writer can see
     can_see_other_writers: bool = False
 

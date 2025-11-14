@@ -16,15 +16,15 @@ def main():
     openai_key = os.environ.get("OPENAI_API_KEY")
 
     if not anthropic_key and not openai_key:
-        print("WARNING: No API keys found in environment variables.")
-        print("Please create a .env file with your API keys or set them directly:")
+        print("NOTE: No API keys found. Only baseline (non-LLM) writers will be available.")
+        print("For LLM writers, please create a .env file with your API keys or set them directly:")
         print("\nOption 1 - Create .env file:")
         print("  ANTHROPIC_API_KEY=your-key-here")
         print("  OPENAI_API_KEY=your-key-here")
         print("\nOption 2 - Export directly:")
         print("  export ANTHROPIC_API_KEY='your-key-here'")
         print("  export OPENAI_API_KEY='your-key-here'")
-        return
+        print("\nContinuing with baseline writers only...\n")
 
     # Initialize orchestrator
     print("\n" + "="*60)
@@ -33,12 +33,13 @@ def main():
 
     orchestrator = WriterOrchestrator(
         config_dir="config/writer_configs",
+        baseline_config_dir="config/baseline_writers",
         data_dir="data/writings"
     )
 
-    # Load all available writers
+    # Load all available writers (LLM + baseline)
     print("Loading writers...")
-    orchestrator.load_all_writers(api_key=anthropic_key or openai_key)
+    orchestrator.load_all_writers(api_key=anthropic_key or openai_key, load_baselines=True)
 
     # List loaded writers
     orchestrator.list_writers()
@@ -62,7 +63,11 @@ def main():
     for writer_id, submission in submissions.items():
         if submission:
             writer = orchestrator.get_writer(writer_id)
-            print(f"Writer: {writer.config.writer_name} (ID: {writer_id})")
+            from baseline_writer import BaselineWriter
+            writer_name = writer.writer_name if isinstance(writer, BaselineWriter) else writer.config.writer_name
+            writer_type = "Baseline" if isinstance(writer, BaselineWriter) else "LLM"
+
+            print(f"Writer: {writer_name} (ID: {writer_id}) [{writer_type}]")
             print(f"Title: {submission.title}")
             print(f"Price: ${submission.price:.2f}")
             print(f"Story length: {len(submission.full_story)} characters")

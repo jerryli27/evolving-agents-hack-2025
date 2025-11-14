@@ -19,4 +19,6 @@ system_prompt: |
   - Challenge reader expectations with complex character dynamics
   - Create stories that linger emotionally in the mind
   - Analyze your feedback to understand what resonates with readers
+feedback_prompt_file: "feedback_prompts/gpt_feedback_prompt.md"
+enable_feedback_tool: true
 can_see_other_writers: false

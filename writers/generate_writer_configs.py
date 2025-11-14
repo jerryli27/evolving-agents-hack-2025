@@ -17,6 +17,13 @@ PROMPT_FILES = [
     "prompts/gpt2.5pro_drama_prompt.md",
 ]
 
+# Define available feedback prompt files
+FEEDBACK_PROMPT_FILES = [
+    "feedback_prompts/claude_feedback_prompt.md",
+    "feedback_prompts/gpt_feedback_prompt.md",
+    "feedback_prompts/gpt2.5pro_feedback_prompt.md",
+]
+
 # Define writer personalities (system prompts)
 PERSONALITIES = {
     "chronicler": {
@@ -153,7 +160,9 @@ def generate_writer_config(
     personality_key: str,
     prompt_file: str,
     llm_key: str,
-    output_dir: Path
+    output_dir: Path,
+    feedback_prompt_file: str = None,
+    enable_feedback_tool: bool = True
 ):
     """Generate a single writer configuration file."""
 
@@ -167,6 +176,8 @@ def generate_writer_config(
         "llm_config": llm_config["config"],
         "prompt_file": prompt_file,
         "system_prompt": personality["prompt"],
+        "feedback_prompt_file": feedback_prompt_file,
+        "enable_feedback_tool": enable_feedback_tool,
         "can_see_other_writers": False
     }
 
@@ -177,11 +188,15 @@ def generate_writer_config(
     return output_path
 
 
-def generate_all_combinations(output_dir: str = "config/experiments"):
+def generate_all_combinations(output_dir: str = "config/experiments", feedback_prompt_file: str = None):
     """Generate all possible combinations of personality, prompt, and LLM."""
 
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
+
+    # Use first feedback prompt as default if none specified
+    if feedback_prompt_file is None:
+        feedback_prompt_file = FEEDBACK_PROMPT_FILES[0]
 
     generated = []
     counter = 1
@@ -198,7 +213,8 @@ def generate_all_combinations(output_dir: str = "config/experiments"):
             personality_key=personality_key,
             prompt_file=prompt_file,
             llm_key=llm_key,
-            output_dir=output_path
+            output_dir=output_path,
+            feedback_prompt_file=feedback_prompt_file
         )
 
         # Extract prompt filename for display
@@ -235,7 +251,9 @@ def generate_subset(
     personalities=None,
     prompt_files=None,
     llm_configs=None,
-    output_dir: str = "config/experiments"
+    output_dir: str = "config/experiments",
+    feedback_prompt_file: str = None,
+    enable_feedback_tool: bool = True
 ):
     """Generate a subset of combinations based on filters."""
 
@@ -246,6 +264,10 @@ def generate_subset(
     personalities = personalities or list(PERSONALITIES.keys())
     prompt_files = prompt_files or PROMPT_FILES
     llm_configs = llm_configs or list(LLM_CONFIGS.keys())
+
+    # Use first feedback prompt as default if none specified and tool is enabled
+    if feedback_prompt_file is None and enable_feedback_tool:
+        feedback_prompt_file = FEEDBACK_PROMPT_FILES[0]
 
     generated = []
     counter = 1
@@ -262,7 +284,9 @@ def generate_subset(
             personality_key=personality_key,
             prompt_file=prompt_file,
             llm_key=llm_key,
-            output_dir=output_path
+            output_dir=output_path,
+            feedback_prompt_file=feedback_prompt_file,
+            enable_feedback_tool=enable_feedback_tool
         )
 
         prompt_name = Path(prompt_file).stem
@@ -315,6 +339,16 @@ if __name__ == "__main__":
         choices=list(LLM_CONFIGS.keys()),
         help="LLM configs to include"
     )
+    parser.add_argument(
+        "--feedback-prompt",
+        choices=FEEDBACK_PROMPT_FILES,
+        help="Feedback prompt file to use (default: first available)"
+    )
+    parser.add_argument(
+        "--disable-feedback-tool",
+        action="store_true",
+        help="Disable the feedback incorporation tool for generated configs"
+    )
 
     args = parser.parse_args()
 
@@ -328,6 +362,10 @@ if __name__ == "__main__":
         print("\nPrompt Files:")
         for pf in PROMPT_FILES:
             print(f"  - {pf}")
+
+        print("\nFeedback Prompt Files:")
+        for fpf in FEEDBACK_PROMPT_FILES:
+            print(f"  - {fpf}")
 
         print("\nLLM Configurations:")
         for key, value in LLM_CONFIGS.items():
@@ -343,7 +381,10 @@ if __name__ == "__main__":
 
     elif args.mode == "all":
         print("Generating all combinations...")
-        generated, index_path = generate_all_combinations(args.output)
+        generated, index_path = generate_all_combinations(
+            output_dir=args.output,
+            feedback_prompt_file=args.feedback_prompt
+        )
         print(f"\nGenerated {len(generated)} configurations in {args.output}/")
         print(f"Index file: {index_path}")
 
@@ -353,7 +394,9 @@ if __name__ == "__main__":
             personalities=args.personalities,
             prompt_files=args.prompts,
             llm_configs=args.llms,
-            output_dir=args.output
+            output_dir=args.output,
+            feedback_prompt_file=args.feedback_prompt,
+            enable_feedback_tool=not args.disable_feedback_tool
         )
         print(f"\nGenerated {len(generated)} configurations in {args.output}/")
         for item in generated:
