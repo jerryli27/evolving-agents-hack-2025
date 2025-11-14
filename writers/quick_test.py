@@ -6,8 +6,10 @@ Allows you to quickly test combinations without creating config files.
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from typing import Union
 from models import WriterConfig, LLMProvider, LLMConfig
 from writer_agent import WriterAgent
+from baseline_writer import BaselineWriter
 
 
 # Load environment
@@ -72,70 +74,99 @@ When writing:
 - Take creative risks while maintaining dramatic coherence
 - Challenge traditional storytelling assumptions
 - Balance innovation with emotional accessibility
-- Analyze feedback to understand which experiments resonate"""
+- Analyze feedback to understand which experiments resonate""",
+
+    "baseline": "baseline"  # Special marker for baseline writers
 }
 
 
 def quick_test(
     personality: str,
-    prompt_file: str,
+    prompt_file: str = None,
     llm_provider: str = "anthropic",
     model: str = "claude-sonnet-4-20250514",
     temperature: float = 0.7,
     round_num: int = 1,
-    writer_id: str = "test_writer"
-):
+    writer_id: str = "test_writer",
+    feedback_prompt_file: str = None,
+    enable_feedback_tool: bool = True
+) -> Union[WriterAgent, BaselineWriter]:
     """
     Quickly test a writer configuration without creating a YAML file.
 
     Args:
-        personality: Writer personality/style (see PERSONALITIES dict)
-        prompt_file: Path to prompt file (e.g., "prompts/claude_drama_prompt.md")
-        llm_provider: "anthropic" or "openai"
-        model: Model name
-        temperature: Temperature for generation
+        personality: Writer personality/style (see PERSONALITIES dict) or "baseline"
+        prompt_file: Path to prompt file (e.g., "prompts/claude_drama_prompt.md") - not used for baseline
+        llm_provider: "anthropic" or "openai" - not used for baseline
+        model: Model name - not used for baseline
+        temperature: Temperature for generation - not used for baseline
         round_num: Round number to execute
         writer_id: Unique ID for this test
+        feedback_prompt_file: Path to feedback prompt file (e.g., "feedback_prompts/claude_feedback_prompt.md")
+        enable_feedback_tool: Whether to enable the feedback incorporation tool
     """
 
     if personality not in PERSONALITIES:
         raise ValueError(f"Unknown personality: {personality}. Choose from: {list(PERSONALITIES.keys())}")
 
-    # Create configuration
-    config = WriterConfig(
-        writer_id=writer_id,
-        writer_name=personality.title(),
-        llm_provider=LLMProvider(llm_provider),
-        llm_config=LLMConfig(
-            model=model,
-            temperature=temperature,
-            max_tokens=4096
-        ),
-        prompt_file=prompt_file,
-        system_prompt=PERSONALITIES[personality],
-        can_see_other_writers=False
-    )
+    # Check if this is a baseline writer
+    if personality == "baseline":
+        print(f"\n{'='*70}")
+        print(f"Testing Configuration:")
+        print(f"  Type: Baseline (non-LLM)")
+        print(f"  Writer ID: {writer_id}")
+        print(f"  Round: {round_num}")
+        print(f"{'='*70}\n")
 
-    # Get API key
-    api_key = None
-    if llm_provider == "anthropic":
-        api_key = os.environ.get("ANTHROPIC_API_KEY")
-    elif llm_provider == "openai":
-        api_key = os.environ.get("OPENAI_API_KEY")
+        writer = BaselineWriter(
+            writer_id=writer_id,
+            writer_name="Baseline Writer",
+            data_dir="data/test_writings"
+        )
+    else:
+        # LLM-based writer
+        if not prompt_file:
+            raise ValueError("prompt_file is required for non-baseline writers")
 
-    if not api_key:
-        raise ValueError(f"No API key found for {llm_provider}. Set {llm_provider.upper()}_API_KEY in .env")
+        # Create configuration
+        config = WriterConfig(
+            writer_id=writer_id,
+            writer_name=personality.title(),
+            llm_provider=LLMProvider(llm_provider),
+            llm_config=LLMConfig(
+                model=model,
+                temperature=temperature,
+                max_tokens=4096
+            ),
+            prompt_file=prompt_file,
+            system_prompt=PERSONALITIES[personality],
+            feedback_prompt_file=feedback_prompt_file,
+            enable_feedback_tool=enable_feedback_tool,
+            can_see_other_writers=False
+        )
 
-    # Create and run writer
-    print(f"\n{'='*70}")
-    print(f"Testing Configuration:")
-    print(f"  Personality: {personality}")
-    print(f"  Prompt File: {prompt_file}")
-    print(f"  LLM: {llm_provider} - {model} (temp={temperature})")
-    print(f"  Round: {round_num}")
-    print(f"{'='*70}\n")
+        # Get API key
+        api_key = None
+        if llm_provider == "anthropic":
+            api_key = os.environ.get("ANTHROPIC_API_KEY")
+        elif llm_provider == "openai":
+            api_key = os.environ.get("OPENAI_API_KEY")
 
-    writer = WriterAgent(config, api_key=api_key, data_dir="data/test_writings")
+        if not api_key:
+            raise ValueError(f"No API key found for {llm_provider}. Set {llm_provider.upper()}_API_KEY in .env")
+
+        # Create and run writer
+        print(f"\n{'='*70}")
+        print(f"Testing Configuration:")
+        print(f"  Type: LLM")
+        print(f"  Personality: {personality}")
+        print(f"  Prompt File: {prompt_file}")
+        print(f"  Feedback Prompt: {feedback_prompt_file if enable_feedback_tool else 'Disabled'}")
+        print(f"  LLM: {llm_provider} - {model} (temp={temperature})")
+        print(f"  Round: {round_num}")
+        print(f"{'='*70}\n")
+
+        writer = WriterAgent(config, api_key=api_key, data_dir="data/test_writings")
 
     try:
         submission = writer.write_round(round_num)
@@ -164,12 +195,13 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "personality",
-        choices=["chronicler", "dreamweaver", "minimalist", "realist", "experimenter"],
-        help="Writer personality"
+        choices=["chronicler", "dreamweaver", "minimalist", "realist", "experimenter", "baseline"],
+        help="Writer personality (use 'baseline' for non-LLM baseline writer)"
     )
     parser.add_argument(
         "prompt_file",
-        help="Path to prompt file (e.g., prompts/claude_drama_prompt.md)"
+        nargs="?",
+        help="Path to prompt file (e.g., prompts/claude_drama_prompt.md) - not needed for baseline"
     )
     parser.add_argument(
         "--provider",
@@ -193,6 +225,15 @@ if __name__ == "__main__":
         default=1,
         help="Round number"
     )
+    parser.add_argument(
+        "--feedback-prompt",
+        help="Path to feedback prompt file (e.g., feedback_prompts/claude_feedback_prompt.md)"
+    )
+    parser.add_argument(
+        "--disable-feedback-tool",
+        action="store_true",
+        help="Disable the feedback incorporation tool"
+    )
 
     args = parser.parse_args()
 
@@ -206,5 +247,7 @@ if __name__ == "__main__":
         llm_provider=args.provider,
         model=args.model,
         temperature=args.temperature,
-        round_num=args.round
+        round_num=args.round,
+        feedback_prompt_file=args.feedback_prompt,
+        enable_feedback_tool=not args.disable_feedback_tool
     )

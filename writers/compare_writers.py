@@ -37,21 +37,30 @@ def compare_configurations(configs: list[dict], round_num: int = 1, save_results
             # Use unique writer_id for each test
             writer_id = f"compare_{i:03d}"
 
-            # Get model with proper default based on provider
-            provider = config.get("provider", "anthropic")
-            model = config.get("model")
-            if model is None:
-                model = "claude-sonnet-4-20250514" if provider == "anthropic" else "gpt-4o"
+            # Check if this is a baseline writer
+            if config["personality"] == "baseline":
+                submission = quick_test(
+                    personality="baseline",
+                    prompt_file=None,
+                    round_num=round_num,
+                    writer_id=writer_id
+                )
+            else:
+                # Get model with proper default based on provider
+                provider = config.get("provider", "anthropic")
+                model = config.get("model")
+                if model is None:
+                    model = "claude-sonnet-4-20250514" if provider == "anthropic" else "gpt-4o"
 
-            submission = quick_test(
-                personality=config["personality"],
-                prompt_file=config["prompt_file"],
-                llm_provider=provider,
-                model=model,
-                temperature=config.get("temperature", 0.7),
-                round_num=round_num,
-                writer_id=writer_id
-            )
+                submission = quick_test(
+                    personality=config["personality"],
+                    prompt_file=config["prompt_file"],
+                    llm_provider=provider,
+                    model=model,
+                    temperature=config.get("temperature", 0.7),
+                    round_num=round_num,
+                    writer_id=writer_id
+                )
 
             results.append({
                 "config": config,
@@ -86,9 +95,13 @@ def compare_configurations(configs: list[dict], round_num: int = 1, save_results
         print(f"[{i}] {name}")
         print(f"{'='*80}")
         print(f"Personality: {config['personality']}")
-        print(f"Prompt: {Path(config['prompt_file']).stem}")
-        print(f"Provider: {config.get('provider', 'anthropic')}")
-        print(f"Temperature: {config.get('temperature', 0.7)}")
+
+        if config["personality"] == "baseline":
+            print(f"Type: Baseline (non-LLM)")
+        else:
+            print(f"Prompt: {Path(config['prompt_file']).stem}")
+            print(f"Provider: {config.get('provider', 'anthropic')}")
+            print(f"Temperature: {config.get('temperature', 0.7)}")
 
         if result["success"]:
             sub = result["submission"]
@@ -123,9 +136,13 @@ def compare_configurations(configs: list[dict], round_num: int = 1, save_results
                 f.write(f"\n## [{i}] {name}\n\n")
                 f.write(f"**Configuration:**\n")
                 f.write(f"- Personality: {config['personality']}\n")
-                f.write(f"- Prompt: {Path(config['prompt_file']).stem}\n")
-                f.write(f"- Provider: {config.get('provider', 'anthropic')}\n")
-                f.write(f"- Temperature: {config.get('temperature', 0.7)}\n\n")
+
+                if config["personality"] == "baseline":
+                    f.write(f"- Type: Baseline (non-LLM)\n\n")
+                else:
+                    f.write(f"- Prompt: {Path(config['prompt_file']).stem}\n")
+                    f.write(f"- Provider: {config.get('provider', 'anthropic')}\n")
+                    f.write(f"- Temperature: {config.get('temperature', 0.7)}\n\n")
 
                 if result["success"]:
                     sub = result["submission"]
@@ -159,7 +176,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--preset",
-        choices=["quick", "temperature", "prompts", "providers", "personalities"],
+        choices=["quick", "temperature", "prompts", "providers", "personalities", "baseline_vs_llm"],
         help="Use a preset comparison"
     )
     parser.add_argument(
@@ -318,6 +335,30 @@ if __name__ == "__main__":
             }
         ]
 
+    elif args.preset == "baseline_vs_llm":
+        # Compare baseline writer vs LLM writers
+        configs = [
+            {
+                "name": "Baseline (Hardcoded)",
+                "personality": "baseline",
+                "prompt_file": None
+            },
+            {
+                "name": "Chronicler (LLM)",
+                "personality": "chronicler",
+                "prompt_file": "prompts/claude_drama_prompt.md",
+                "provider": "anthropic",
+                "temperature": 0.7
+            },
+            {
+                "name": "Minimalist (LLM)",
+                "personality": "minimalist",
+                "prompt_file": "prompts/claude_drama_prompt.md",
+                "provider": "anthropic",
+                "temperature": 0.7
+            }
+        ]
+
     else:
         print("Error: Must specify --configs file or --preset")
         print("\nAvailable presets:")
@@ -326,6 +367,7 @@ if __name__ == "__main__":
         print("  prompts - Compare different prompt files")
         print("  providers - Compare Anthropic vs OpenAI")
         print("  personalities - Compare all 5 personalities")
+        print("  baseline_vs_llm - Compare baseline vs LLM writers")
         exit(1)
 
     compare_configurations(configs, round_num=args.round, save_results=not args.no_save)

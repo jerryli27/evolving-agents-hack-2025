@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional
 from models import WriterConfig, StorySubmission
 from llm_apis import LLMClientFactory, Message, ToolDefinition
-from tools import PastWritingsTool, SubmitStoryTool
+from tools import PastWritingsTool, SubmitStoryTool, FeedbackIncorporationTool
 
 
 class WriterAgent:
@@ -31,6 +31,7 @@ class WriterAgent:
         # Initialize tools
         self.past_writings_tool = PastWritingsTool(data_dir)
         self.submit_story_tool = SubmitStoryTool(data_dir)
+        self.feedback_tool = FeedbackIncorporationTool(config.feedback_prompt_file) if config.enable_feedback_tool else None
 
         # Load and build the complete system prompt
         self.system_prompt = self._build_system_prompt()
@@ -83,10 +84,16 @@ class WriterAgent:
 
     def _get_tools(self) -> list[ToolDefinition]:
         """Get tool definitions for the LLM."""
-        return [
+        tools = [
             ToolDefinition(**self.past_writings_tool.get_tool_definition()),
             ToolDefinition(**self.submit_story_tool.get_tool_definition()),
         ]
+
+        # Add feedback tool if enabled
+        if self.feedback_tool:
+            tools.append(ToolDefinition(**self.feedback_tool.get_tool_definition()))
+
+        return tools
 
     def _handle_tool_call(self, tool_name: str, tool_input: dict) -> str:
         """Execute a tool call and return the result."""
@@ -106,6 +113,11 @@ class WriterAgent:
                 short_summary=tool_input.get("short_summary", ""),
                 price=tool_input.get("price", 1.0),
             )
+        elif tool_name == "get_feedback_framework":
+            if self.feedback_tool:
+                return self.feedback_tool.get_feedback_framework()
+            else:
+                return "Error: Feedback incorporation tool is not enabled for this writer."
         else:
             return f"Error: Unknown tool '{tool_name}'"
 
@@ -129,18 +141,37 @@ class WriterAgent:
         self._iteration_log = []  # Track each iteration for debugging
 
         # Initial prompt
+        tools_list = [
+            "1. get_past_writings - View your past stories and their performance",
+            "2. submit_story - Submit your completed story and receive feedback"
+        ]
+
+        if self.feedback_tool:
+            tools_list.insert(1, "2. get_feedback_framework - Access strategic guidance on incorporating market feedback")
+            tools_list[2] = "3. submit_story - Submit your completed story and receive feedback"
+
         initial_prompt = (
             f"You are {self.config.writer_name}, a creative writer. "
             f"It's now Round {round_num}. Your task is to write a short story synopsis.\n\n"
             f"You have access to the following tools:\n"
-            f"1. get_past_writings - View your past stories and their performance\n"
-            f"2. submit_story - Submit your completed story and receive feedback\n\n"
+            f"{chr(10).join(tools_list)}\n\n"
             f"Process:\n"
             f"1. (Optional) Review your past writings to learn from feedback\n"
-            f"2. Write your story\n"
-            f"3. Submit your story using the submit_story tool\n\n"
-            f"Begin writing!"
         )
+
+        if self.feedback_tool:
+            initial_prompt += (
+                f"2. (Optional) Access the feedback framework for strategic guidance on interpretation\n"
+                f"3. Write your story\n"
+                f"4. Submit your story using the submit_story tool\n\n"
+            )
+        else:
+            initial_prompt += (
+                f"2. Write your story\n"
+                f"3. Submit your story using the submit_story tool\n\n"
+            )
+
+        initial_prompt += "Begin writing!"
 
         self.conversation_history.append(Message(role="user", content=initial_prompt))
 

@@ -28,6 +28,12 @@ All commands assume you've activated the virtual environment first: `source .ven
 ### Test a Single Configuration
 
 ```bash
+# Test baseline (non-LLM) writer
+python quick_test.py baseline
+
+# Test baseline writer with different round
+python quick_test.py baseline --round 3
+
 # Test minimalist with Claude prompt
 python quick_test.py minimalist prompts/claude_drama_prompt.md
 
@@ -52,6 +58,9 @@ python compare_writers.py --preset prompts
 
 # Compare providers
 python compare_writers.py --preset providers
+
+# Compare baseline vs LLM writers
+python compare_writers.py --preset baseline_vs_llm
 
 # Quick 3-way comparison
 python compare_writers.py --preset quick
@@ -84,6 +93,15 @@ python example.py
 ```
 
 This loads all writers from `config/writer_configs/` and runs Round 1.
+
+### Test Baseline Writers
+
+```bash
+# Test baseline (non-LLM) writers
+python test_baseline.py
+```
+
+This tests the baseline writers with hardcoded submissions based on real fiction.
 
 ## Common Workflows
 
@@ -160,7 +178,8 @@ Transcripts include:
 
 ## File Locations
 
-- **Configurations**: `config/writer_configs/*.yaml`
+- **LLM Writer Configurations**: `config/writer_configs/*.yaml`
+- **Baseline Writer Configurations**: `config/baseline_writers/*.yaml`
 - **Prompts**: `prompts/*.md`
 - **Writer Data**: `data/writings/*.json`
 - **Comparison Results**: `ignore/comparison_results/*.md`
@@ -169,5 +188,6 @@ Transcripts include:
 
 ## Next Steps
 
+- Read [BASELINE_WRITERS.md](BASELINE_WRITERS.md) for info on baseline (non-LLM) writers
 - Read [USAGE.md](USAGE.md) for API reference
 - Read [ARCHITECTURE.md](ARCHITECTURE.md) for system design details

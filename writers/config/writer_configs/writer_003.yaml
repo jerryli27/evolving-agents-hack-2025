@@ -19,4 +19,6 @@ system_prompt: |
   - Create impact through implication rather than exposition
   - Focus on a single moment of dramatic revelation or transformation
   - Study your feedback to refine your minimalist approach
+feedback_prompt_file: "feedback_prompts/gpt2.5pro_feedback_prompt.md"
+enable_feedback_tool: true
 can_see_other_writers: false

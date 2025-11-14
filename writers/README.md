@@ -5,6 +5,7 @@ A flexible system for creating autonomous AI writers that compose stories, learn
 ## Features
 
 - **Autonomous Writers**: Each writer is a fully autonomous LLM agent with its own personality and style
+- **Baseline Writers**: Non-LLM writers with hardcoded submissions for benchmarking (NEW!)
 - **Multi-Provider Support**: Use Anthropic, OpenAI, or easily add new providers (Gemini, Grok, DeepSeek, etc.)
 - **Learning & Improvement**: Writers access their past work and feedback to improve
 - **Flexible Configuration**: YAML-based configuration with Pydantic validation
@@ -41,7 +42,14 @@ uv sync --frozen
 
 2. Run the example:
 ```bash
+# LLM writers only
 python example.py
+
+# LLM + baseline writers
+python example_with_baseline.py
+
+# Test baseline writers
+python test_baseline.py
 ```
 
 This will load all writers from `config/writer_configs/` and run them through Round 1.
@@ -78,7 +86,8 @@ submissions = orchestrator.run_round_for_all(round_num=1)
 ```
 writers/
 ├── models.py              # Core data models (Pydantic)
-├── writer_agent.py        # Writer agent implementation
+├── writer_agent.py        # LLM writer agent implementation
+├── baseline_writer.py     # Baseline (non-LLM) writer [NEW]
 ├── orchestrator.py        # Orchestrator for managing writers
 ├── llm_apis/              # Multi-provider LLM clients
 │   ├── base.py
@@ -89,9 +98,12 @@ writers/
 │   ├── past_writings.py
 │   └── submit_story.py
 ├── config/
-│   └── writer_configs/    # YAML configs for each writer
-└── data/
-    └── writings/          # JSON storage for histories
+│   ├── writer_configs/    # YAML configs for LLM writers
+│   └── baseline_writers/  # YAML configs for baseline writers [NEW]
+├── data/
+│   └── writings/          # JSON storage for histories
+└── ignore/
+    └── transcripts/       # LLM interaction logs for debugging
 ```
 
 ## Configuration
@@ -150,10 +162,16 @@ See [EXPERIMENTS.md](EXPERIMENTS.md) for a complete guide to finding optimal wri
 
 ## Documentation
 
+- [QUICKSTART.md](QUICKSTART.md) - Quick start guide with common commands
+- [INTERCHANGEABLE_WRITERS.md](INTERCHANGEABLE_WRITERS.md) - How to use baseline & LLM writers interchangeably [NEW]
+- [BASELINE_WRITERS.md](BASELINE_WRITERS.md) - Guide to baseline (non-LLM) writers
 - [USAGE.md](USAGE.md) - Detailed usage guide and API reference
 - [EXPERIMENTS.md](EXPERIMENTS.md) - Guide to mixing and matching configurations
-- [example.py](example.py) - Working example script
-- [quick_test.py](quick_test.py) - Quick testing tool
+- [example.py](example.py) - Working example script (now supports baseline writers)
+- [example_with_baseline.py](example_with_baseline.py) - Example with baseline writers
+- [test_baseline.py](test_baseline.py) - Baseline writer tests
+- [quick_test.py](quick_test.py) - Quick testing tool (now supports baseline writers)
+- [compare_writers.py](compare_writers.py) - Comparison tool (now supports baseline writers)
 - [generate_writer_configs.py](generate_writer_configs.py) - Batch config generation
 
 ## Adding New LLM Providers

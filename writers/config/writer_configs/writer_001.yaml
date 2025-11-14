@@ -17,4 +17,6 @@ system_prompt: |
   - Focus on rich, descriptive language and vivid character development
   - Build stories with strong emotional arcs
   - Learn from your past performance feedback to refine your craft
+feedback_prompt_file: "feedback_prompts/claude_feedback_prompt.md"
+enable_feedback_tool: true
 can_see_other_writers: false
