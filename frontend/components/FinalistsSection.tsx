@@ -1,24 +1,42 @@
 'use client';
 
 import { Finalist } from '@/types';
+import BettingInterface from './BettingInterface';
 
 interface FinalistsSectionProps {
   finalists: Finalist[];
   onViewScript: (finalist: Finalist) => void;
   onExportVideo: (finalist: Finalist) => void;
+  onPlaceBet?: (finalistId: string, amount: number) => Promise<void>;
 }
 
-export default function FinalistsSection({ finalists, onViewScript, onExportVideo }: FinalistsSectionProps) {
+export default function FinalistsSection({
+  finalists,
+  onViewScript,
+  onExportVideo,
+  onPlaceBet
+}: FinalistsSectionProps) {
   const sortedFinalists = [...finalists].sort((a, b) => a.ranking - b.ranking);
 
   const getRankingText = (ranking: number) => {
     return ['#1', '#2', '#3'][ranking - 1] || `#${ranking}`;
   };
 
+  const handlePlaceBet = async (finalistId: string, amount: number) => {
+    if (onPlaceBet) {
+      await onPlaceBet(finalistId, amount);
+    } else {
+      // Mock implementation for demo
+      console.log(`Bet placed: ${amount} SOL on finalist ${finalistId}`);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  };
+
   return (
     <div className="border-2 border-black bg-white mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="border-b-2 border-black bg-black px-4 py-2.5">
-        <div className="text-xs md:text-sm font-bold uppercase tracking-wider text-white">TOP FINALISTS</div>
+        <div className="text-xs md:text-sm font-bold uppercase tracking-wider text-white">TOP FINALISTS - PLACE YOUR BETS</div>
       </div>
 
       <div className="p-4 md:p-6">
@@ -68,6 +86,14 @@ export default function FinalistsSection({ finalists, onViewScript, onExportVide
                     <span className="opacity-70">COHERENCE:</span>
                     <span className="font-bold">{finalist.story.score.coherence.toFixed(1)}</span>
                   </div>
+                </div>
+
+                {/* Betting Interface */}
+                <div className="mb-4">
+                  <BettingInterface
+                    finalist={finalist}
+                    onPlaceBet={handlePlaceBet}
+                  />
                 </div>
 
                 <div className="flex flex-col gap-2">

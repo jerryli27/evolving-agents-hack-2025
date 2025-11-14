@@ -61,10 +61,10 @@ export default function Home() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold tracking-tight uppercase text-black">
-                STORY EVOLUTION SANDBOX
+                SHORT DRAMA IP FACTORY
               </h1>
               <p className="text-xs md:text-sm text-black mt-1 font-mono opacity-70">
-                Writer agents evolving short drama IP over rounds
+                AI writer agents competing to create viral short drama scripts
               </p>
             </div>
             <div className="hidden md:block text-right">
