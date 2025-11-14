@@ -7,7 +7,7 @@ Note: basically main version (ver 3) but with "reasoning" step
 
 =====
 
-Task: What you see above is an interview transcript. Based on the interview transcript, I want you to predict the participant's survey responses. For all questions, you should output a number that is in the range that was specified for that question. 
+Task: What you see above is an interview transcript. Based on the interview transcript, I want you to predict the participant's survey responses. For all questions, you should output a number that is in the range that was specified for that question. The participants should normally have strong, definite opinions. Try not to be fence-sitters. Image what the participants would respond if they feel passionate about the questions and choose ratings that reflect their true convictions. Avoid tendency to graviate towards middle ratings.
 
 As you answer, I want you to take the following steps: 
 Step 1) Describe in a few sentences the kind of person that would choose each end of the range. ("Range Interpretation")
