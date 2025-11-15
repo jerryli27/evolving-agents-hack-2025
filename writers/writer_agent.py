@@ -13,7 +13,7 @@ from feedback_providers import FeedbackProvider
 class WriterAgent:
     """An autonomous LLM-powered writer agent."""
 
-    def __init__(self, config: WriterConfig, api_key: Optional[str] = None, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None):
+    def __init__(self, config: WriterConfig, api_key: Optional[str] = None, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None, transcript_dir: Optional[str] = None):
         """
         Initialize a writer agent.
 
@@ -22,6 +22,7 @@ class WriterAgent:
             api_key: Optional API key for the LLM provider
             data_dir: Directory for storing data
             feedback_provider: Optional feedback provider (defaults to MockFeedbackProvider)
+            transcript_dir: Directory for saving transcripts (defaults to ignore/transcripts)
         """
         self.config = config
         self.llm_client = LLMClientFactory.create_client(
@@ -29,6 +30,9 @@ class WriterAgent:
             config=config.llm_config,
             api_key=api_key,
         )
+
+        # Store transcript directory
+        self.transcript_dir = transcript_dir if transcript_dir else "ignore/transcripts"
 
         # Initialize tools
         self.past_writings_tool = PastWritingsTool(data_dir)
@@ -42,7 +46,7 @@ class WriterAgent:
         self.conversation_history: list[Message] = []
 
     @classmethod
-    def from_yaml(cls, config_path: str, api_key: Optional[str] = None, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None) -> "WriterAgent":
+    def from_yaml(cls, config_path: str, api_key: Optional[str] = None, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None, transcript_dir: Optional[str] = None) -> "WriterAgent":
         """
         Load a writer agent from a YAML configuration file.
 
@@ -51,6 +55,7 @@ class WriterAgent:
             api_key: Optional API key for the LLM provider
             data_dir: Directory for storing data
             feedback_provider: Optional feedback provider (defaults to MockFeedbackProvider)
+            transcript_dir: Directory for saving transcripts (defaults to ignore/transcripts)
 
         Returns:
             WriterAgent instance
@@ -59,7 +64,7 @@ class WriterAgent:
             config_data = yaml.safe_load(f)
 
         config = WriterConfig(**config_data)
-        return cls(config, api_key, data_dir, feedback_provider)
+        return cls(config, api_key, data_dir, feedback_provider, transcript_dir)
 
     def _build_system_prompt(self) -> str:
         """
@@ -191,6 +196,8 @@ class WriterAgent:
                 full_story=tool_input["full_story"],
                 round=self._current_round,
                 short_summary=tool_input.get("short_summary", ""),
+                full_story_summary=tool_input.get("full_story_summary", ""),
+                episode_summary=tool_input.get("episode_summary", ""),
                 price=tool_input.get("price", 1.0),
             )
         elif tool_name == "get_feedback_framework":
@@ -330,7 +337,7 @@ class WriterAgent:
         """Save the full conversation transcript for debugging."""
         from datetime import datetime
 
-        transcript_dir = Path("ignore/transcripts") / self.config.writer_id
+        transcript_dir = Path(self.transcript_dir) / self.config.writer_id
         transcript_dir.mkdir(parents=True, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -349,7 +356,7 @@ class WriterAgent:
                 "temperature": self.config.llm_config.temperature,
                 "prompt_file": self.config.prompt_file,
             },
-            "system_prompt": self.system_prompt[:500] + "..." if len(self.system_prompt) > 500 else self.system_prompt,
+            "system_prompt": self.system_prompt,
             "iterations": self._iteration_log,
             "final_conversation": [
                 {"role": m.role, "content": m.content}

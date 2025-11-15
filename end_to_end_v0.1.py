@@ -411,6 +411,10 @@ Examples:
     print_banner("SIMULATION COMPLETE")
     print(f"Data saved to: {args.data_dir}/")
     print(f"Writer histories: {args.data_dir}/*.json")
+    print(f"Debug transcripts: {args.data_dir}/debug/transcripts/")
+    print()
+    print(f"To view transcripts:")
+    print(f"  python writers/view_transcript.py view {args.data_dir}/debug/transcripts/writer_XXX/round_X_success_TIMESTAMP.json")
     print()
 
 

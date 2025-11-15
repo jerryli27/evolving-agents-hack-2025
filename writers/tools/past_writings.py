@@ -56,6 +56,7 @@ class PastWritingsTool:
 
         for writing in writings:
             output.append(f"\n{writing.performance_summary}")
+            output.append(f"\n  Story:\n{writing.submission.full_story}")
             output.append("-" * 60)
 
         # TODO: Add other writers' works if include_other_writers is True

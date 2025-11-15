@@ -31,6 +31,37 @@ source writers/.venv/bin/activate
 python end_to_end_v0.1.py --mock
 ```
 
+### Compare three prompt settings.
+```bash
+# Make sure all test configs exist
+ls writers/config/writer_configs/writer_*test.yaml
+
+# Launch all three tests in parallel
+writers/.venv/bin/python end_to_end_v0.1.py --rounds 3 --data-dir data/claude_framework_run1 --writers writer_claude_test.yaml > logs/claude_final.log 2>&1 &
+
+writers/.venv/bin/python end_to_end_v0.1.py --rounds 3 --data-dir data/gemini_framework_run1 --writers writer_gemini_test.yaml > logs/gemini_final.log 2>&1 &
+
+writers/.venv/bin/python end_to_end_v0.1.py --rounds 3 --data-dir data/chatgpt_framework_run1 --writers writer_chatgpt_test.yaml > logs/chatgpt_final.log 2>&1 &
+
+# Check they're running
+ps aux | grep "end_to_end.*yaml" | grep -v grep
+
+# Monitor progress (wait a bit for output to flush)
+sleep 20
+tail -20 logs/claude_final.log
+tail -20 logs/gemini_final.log
+tail -20 logs/chatgpt_final.log
+
+# Check when they complete
+ps aux | grep "end_to_end.*yaml" | grep -v grep  # Empty means done
+
+# View results
+ls -lh data/claude_framework_run1/
+ls -lh data/gemini_framework_run1/
+ls -lh data/chatgpt_framework_run1/
+
+```
+
 ### Full Real LLM Mode
 
 ```bash

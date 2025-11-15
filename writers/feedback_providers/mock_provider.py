@@ -31,7 +31,9 @@ class MockFeedbackProvider(FeedbackProvider):
         price: float,
         timestep: int,
         writer_id: str,
-        round_num: int
+        round_num: int,
+        full_story_summary: str = "",
+        episode_summary: str = ""
     ) -> FeedbackResponse:
         """Generate mock feedback with random scores."""
 

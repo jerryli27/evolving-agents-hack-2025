@@ -64,6 +64,14 @@ class ReaderFeedback(BaseModel):
     rating: float = 0.0
     comment: str = ""
     # More fields TBD
+    
+    def format_feedback(self) -> str:
+        """Format this reader's feedback for display."""
+        return (
+            f"    Reader {self.reader_id}:\n"
+            f"      Rating: {self.rating:.2f}\n"
+            f"      Comment: {self.comment}"
+        )
 
 
 class FeedbackResponse(BaseModel):
@@ -89,7 +97,7 @@ class PastWriting(BaseModel):
             return "No feedback yet"
 
         fb = self.feedback
-        return (
+        summary = (
             f"Round {self.submission.round}: '{self.submission.title}'\n"
             f"  Sold: {fb.sold_percentage*100:.1f}%\n"
             f"  Total Score: {fb.aggregated_total_score:.2f}\n"
@@ -98,6 +106,14 @@ class PastWriting(BaseModel):
             f"  Quality: {fb.aggregated_quality_score:.2f}\n"
             f"  Feedback: {fb.aggregated_qualitative_feedback}"
         )
+        
+        # Add raw feedback if available
+        if fb.raw_feedback:
+            summary += "\n  Raw Feedback from Individual Readers:"
+            for reader_feedback in fb.raw_feedback:
+                summary += f"\n{reader_feedback.format_feedback()}"
+        
+        return summary
 
 
 class WriterHistory(BaseModel):

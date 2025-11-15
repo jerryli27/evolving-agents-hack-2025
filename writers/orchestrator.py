@@ -86,7 +86,9 @@ class WriterOrchestrator:
             writer = writer_class.from_yaml(str(config_path), data_dir=str(self.data_dir), feedback_provider=writer_feedback_provider)
         else:
             config_path = self.config_dir / config_filename
-            writer = WriterAgent.from_yaml(str(config_path), api_key=api_key, data_dir=str(self.data_dir), feedback_provider=writer_feedback_provider)
+            # Set transcript directory to debug/transcripts under data_dir
+            transcript_dir = str(self.data_dir / "debug" / "transcripts")
+            writer = WriterAgent.from_yaml(str(config_path), api_key=api_key, data_dir=str(self.data_dir), feedback_provider=writer_feedback_provider, transcript_dir=transcript_dir)
 
         writer_id = writer.writer_id if is_baseline else writer.config.writer_id
         self.writers[writer_id] = writer
@@ -185,6 +187,8 @@ class WriterOrchestrator:
                     submissions[writer_id] = submission
                 except Exception as e:
                     print(f"Error running round for {writer_id}: {e}")
+                    import traceback
+                    traceback.print_exc()  # Print full stack trace
                     submissions[writer_id] = None
             return submissions
 
@@ -199,6 +203,7 @@ class WriterOrchestrator:
             except Exception as e:
                 print(f"Error running round for {writer_id}: {e}")
                 import traceback
+                traceback.print_exc()  # Print full stack trace
                 return writer_id, None, str(e)
 
         # Execute writers in parallel

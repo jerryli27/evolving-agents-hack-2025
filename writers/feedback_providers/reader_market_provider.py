@@ -66,7 +66,9 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         price: float,
         timestep: int,
         writer_id: str,
-        round_num: int
+        round_num: int,
+        full_story_summary: str = "",
+        episode_summary: str = ""
     ) -> FeedbackResponse:
         """
         Get feedback from ReaderMarket generative agents.
@@ -77,11 +79,16 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         """
         self._ensure_initialized()
 
+        # Use the new parameters if provided, otherwise fall back to short_summary for backward compatibility
+        _full_story_summary = full_story_summary if full_story_summary else short_summary
+        _episode_summary = episode_summary if episode_summary else short_summary
+
         # Get feedback from ReaderMarket
         aggregated_feedback = self._reader_market.get_reader_feedback(
             title=title,
-            full_story=full_story,
-            short_summary=short_summary,
+            full_story_summary=_full_story_summary,
+            episode_story=full_story,
+            episode_summary=_episode_summary,
             timestep=timestep,
             price=price
         )
