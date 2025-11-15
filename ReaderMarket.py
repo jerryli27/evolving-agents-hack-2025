@@ -4,6 +4,7 @@ from genagents.genagents.genagents import GenerativeAgent
 from readers_parameters import *
 from genagents.simulation_engine.settings import OPENAI_API_KEY, LLM_VERS
 import re
+import json
 
 import openai
 
@@ -115,7 +116,7 @@ class ReaderMarket():
             if similarity != None:
                 responses['responses'][0] = similarity
 
-            print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} has the following thoughts in terms of the novelty of the book {title}.")
+            print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} has the following thoughts in terms of the novelty of the show {title}.")
             print(responses)
             expectation_score = sum(responses["responses"]) / len(expectation_questions) / 10.0
             novelty_score = 1.0 - expectation_score
@@ -148,7 +149,7 @@ class ReaderMarket():
             self.agent_prediction[agent.scratch['first_name'] + ' ' + agent.scratch['last_name']] = f"{prediction}"
 
             individual_feedback = {
-                "reader_agent": agent,
+                "reader_agent": f"{agent.scratch['first_name']} {agent.scratch['last_name']}",
                 "total_score" : quality_score * quality_weight + novelty_score * novelty_weight + relevance_score * relevance_weight,
                 "novelty" : novelty_score,
                 "relevance" : relevance_score,
@@ -164,8 +165,8 @@ class ReaderMarket():
             "aggregated_novelty_score": 0. if len(all_individual_feedback) == 0 else sum([f['novelty'] for f in all_individual_feedback]) / len(all_individual_feedback),
             "aggregated_relevance_score": 0. if len(all_individual_feedback) == 0 else sum([f['relevance'] for f in all_individual_feedback]) / len(all_individual_feedback),
             "aggregated_quality_score": 0. if len(all_individual_feedback) == 0 else sum([f['quality'] for f in all_individual_feedback]) / len(all_individual_feedback),
-            "aggregated_qualitative_feedback": query_gpt(qualitative_feedback_aggregation_prompt.format(all_feedback = '\n'.join([f"Feedback from {f['reader_agent'].scratch['first_name']}: {f['qualitative_feedback']}" for f in all_individual_feedback]))),
-            "aggregated_prediction_for_next_episode": query_gpt(prediction_aggregation_prompt.format(all_prediction = '\n'.join([f"Prediction from {f['reader_agent'].scratch['first_name']}: {f['prediction_for_next_episode']}" for f in all_individual_feedback]))),
+            "aggregated_qualitative_feedback": query_gpt(qualitative_feedback_aggregation_prompt.format(all_feedback = '\n'.join([f"Feedback from {f['reader_agent']}: {f['qualitative_feedback']}" for f in all_individual_feedback]))),
+            "aggregated_prediction_for_next_episode": query_gpt(prediction_aggregation_prompt.format(all_prediction = '\n'.join([f"Prediction from {f['reader_agent']}: {f['prediction_for_next_episode']}" for f in all_individual_feedback]))),
             "raw_feedback": all_individual_feedback
         }
 
@@ -192,19 +193,30 @@ if __name__ == "__main__":
     #- Return to the digital world: Becomes a mindful influencer, surrounded by others chasing curated authenticity, fully aware of the algorithmic loop he can’t escape.
     #"""
 
-    title = "The Mirror's Secret"
+    title = "The Cartographer's Daughter"
     story_summary = """
-    "When Emma Chen inherits her grandmother's Victorian mansion, she discovers her entire life has been built on lies. Her supposedly dead grandfather is alive, her parents aren't her real parents, and her family has been protecting a dangerous secret for decades. As Emma uncovers the truth about her identity, she realizes she's at the center of a conspiracy that could destroy everyone she loves—and that some family secrets are worth killing for."
+    "A young woman in 1943 Berlin must choose between family loyalty and moral conscience when she discovers her father's maps are being used to target Jewish neighborhoods for deportation."
     """
     episode_summaries = [
-      """
-      Emma finds a cryptic note from her dead grandmother leading her to discover a hidden room behind an antique mirror. Inside, she finds recent photographs of her supposedly dead grandfather and evidence that her parents aren't her biological parents. The episode ends with her grandfather's voice calling to her from deeper in the secret passage—very much alive."""    ]
+        "Berlin, March 1943. Amid Allied bombing raids, Greta Hoffman navigates life in a city under siege. She admires her father Heinrich, Berlin’s most respected cartographer, and takes pride in his work, unaware of the dark purpose it serves.",
+        "Greta discovers a stack of her father’s maps in a Gestapo officer’s briefcase, marked with red circles and coded numbers. Horrified, she realizes the maps are being used to identify and deport Jewish families. Confronting her father, she learns of the impossible choice he faces: comply with the Gestapo or risk the death of his family.",
+        "Torn between love for her father and moral outrage, Greta wrestles with her conscience. She considers sabotaging the maps to save lives but fears the consequences for her family. The chapter explores her internal conflict and the impossible moral choices faced under totalitarian rule.",
+        "Greta devises a careful plan to alter the maps, misdirecting the Gestapo while minimizing risk to her father. Working under pressure, she executes the sabotage with precision, demonstrating courage, ingenuity, and moral resolve.",
+        "The sabotage is discovered, forcing Greta to flee into the very neighborhoods her father once mapped. She finds refuge among the people she tried to save, confronting the dangers and complexities of survival. A final confrontation with her father underscores the story’s moral tension and the personal cost of conscience.",
+        "Greta reflects on complicity, resistance, and the sacrifices required to protect loved ones. The story closes by highlighting the courage it takes to act with conscience under tyranny and the blurred lines between right and wrong in times of unimaginable pressure."
+    ]
 
     episode_stories = [
-        """Emma had always hated mirrors, but the one in her grandmother's hallway seemed to hate her back. The ornate Victorian frame loomed eight feet tall, its silver surface reflecting not just her face, but something darker—a shadow that shouldn't exist.\n\n"Behind the mirror, when the moon is full." Grandmother's final note had been cryptic, almost cruel. But tonight, with moonlight streaming through dusty windows, Emma pressed her palm against the glass.\n\nIt moved.\n\nThe mirror swung inward like a door, revealing a narrow staircase descending into blackness. Emma's phone flashlight illuminated stone walls covered in photographs—dozens of them, all featuring the same man. Her grandfather. The one who'd supposedly died before she was born.\n\nBut these photos were recent. Last month recent.\n\nIn the final image, he stood beside a woman Emma didn't recognize, holding what looked like a birth certificate. Written on the back in her grandmother's handwriting: "Thomas and Sarah, Christmas 2023. Emma's real parents. Still protecting our girl."\n\nEmma's world tilted. Her parents weren't her parents?\n\nA voice drifted up from the passage below—familiar, warm, impossible.\n\n"Emma? I've been waiting twenty-eight years for you to find this room."\n\nHer grandfather's voice. Very much alive.""" ]
+        "Berlin, March 1943. Amid Allied bombing raids, Greta Hoffman navigates life in a city under siege. She admires her father Heinrich, Berlin’s most respected cartographer, and takes pride in his work, unaware of the dark purpose it serves.",
+        "Greta discovers a stack of her father’s maps in a Gestapo officer’s briefcase, marked with red circles and coded numbers. Horrified, she realizes the maps are being used to identify and deport Jewish families. Confronting her father, she learns of the impossible choice he faces: comply with the Gestapo or risk the death of his family.",
+        "Torn between love for her father and moral outrage, Greta wrestles with her conscience. She considers sabotaging the maps to save lives but fears the consequences for her family. The chapter explores her internal conflict and the impossible moral choices faced under totalitarian rule.",
+        "Greta devises a careful plan to alter the maps, misdirecting the Gestapo while minimizing risk to her father. Working under pressure, she executes the sabotage with precision, demonstrating courage, ingenuity, and moral resolve.",
+        "The sabotage is discovered, forcing Greta to flee into the very neighborhoods her father once mapped. She finds refuge among the people she tried to save, confronting the dangers and complexities of survival. A final confrontation with her father underscores the story’s moral tension and the personal cost of conscience.",
+        "Greta reflects on complicity, resistance, and the sacrifices required to protect loved ones. The story closes by highlighting the courage it takes to act with conscience under tyranny and the blurred lines between right and wrong in times of unimaginable pressure."
+    ]
 
     market = ReaderMarket()
-    for i in range(1):
+    for i in range(6):
         print(f"--- Episode {i+1} ---")
         res = market.get_reader_feedback(title, story_summary, episode_stories[i], episode_summaries[i], i+1)
         print(json.dumps(res, indent=4))
