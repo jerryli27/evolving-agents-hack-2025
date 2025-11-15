@@ -2,7 +2,7 @@ agent_bank_path = "genagents/agent_bank/populations/gss_agents/"
 
 
 # Parameters
-num_readers = 5
+num_readers = 2
 novelty_weight = 0.4
 relevance_weight = 0.3
 quality_weight = 1.0 - novelty_weight - relevance_weight
@@ -29,6 +29,7 @@ open_ended_feedback = [
 # Prompts 
 reading_decision_prompt = """
 You just got off work. You are tierd and relaxing on the couch. You are scrolling through a list of short drama episode to watch. You saw episode {timestep} of the series {title}. The full story of {title} is summaeized as: {full_story_summary}.
+You just got off work. You are tierd and relaxing on the couch. You are scrolling through a list of short drama episode to watch. You saw episode {timestep} of the series {title}. The full story of {title} is summaeized as: {full_story_summary}.
 This episode presents the following plot: {summary}.
 Would you be interested to watch? Note that you are busy and you have limited time and attention. Only shows that really stand out will be worth your time. 
 """
@@ -39,4 +40,4 @@ prediction_alignment_prompt = "The following is the summary of the story in an e
 
 qualitative_feedback_aggregation_prompt = "Summarize the following feedback for an episode from a show. The feedback are from different audience so they might repeat or contradict with each other. Summarize them into a bullet list that represent the clustered themes of opinions from the audience and capture the significant patterns.\n {all_feedback}"
 
-prediction_aggregation_prompt = "Summarize the following prediction for the next episode of a show into a bullet list. Capture all the predictions. ONLY include predictions. Skip comments about how good or bad the show is and what the audience wants to see or not want to see in future episodes. \n {all_prediction}"
+prediction_aggregation_prompt = "Summarize the following prediction for the next episode of a show into a bullet list. Capture all the predictions. \n {all_prediction}"
