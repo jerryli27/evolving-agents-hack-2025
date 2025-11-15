@@ -19,6 +19,11 @@ export default function ExportVideoModal({ finalist, onClose }: ExportVideoModal
   const [copied, setCopied] = useState<string | null>(null);
   const [exportFormat, setExportFormat] = useState<ExportFormat>('blueprint');
 
+  // Video generation state
+  const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
+  const [videoGenerated, setVideoGenerated] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
+
   // Generate blueprint on mount or when settings change
   useEffect(() => {
     generateBlueprint();
@@ -79,6 +84,31 @@ export default function ExportVideoModal({ finalist, onClose }: ExportVideoModal
     } catch (err) {
       console.error(`Error exporting ${format} format:`, err);
     }
+  };
+
+  // Mock video generation
+  const handleGenerateVideo = async () => {
+    setIsGeneratingVideo(true);
+    setVideoProgress(0);
+
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      setVideoProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(progressInterval);
+          return 95;
+        }
+        return prev + 5;
+      });
+    }, 150);
+
+    // Simulate 3 second generation
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    clearInterval(progressInterval);
+    setVideoProgress(100);
+    setVideoGenerated(true);
+    setIsGeneratingVideo(false);
   };
 
   const visualStyles = [
@@ -287,6 +317,71 @@ export default function ExportVideoModal({ finalist, onClose }: ExportVideoModal
             </div>
           </div>
         </div>
+
+        {/* Video Generation Section */}
+        {blueprint && !loading && (
+          <div className="border-t-2 border-black bg-gray-50 p-6">
+            <h3 className="text-sm font-bold uppercase tracking-wide mb-4 text-black">
+              Generate Video
+            </h3>
+
+            {!videoGenerated && !isGeneratingVideo && (
+              <button
+                onClick={handleGenerateVideo}
+                className="w-full py-4 px-6 bg-black text-white border-2 border-black hover:bg-gray-900 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 font-bold text-sm uppercase tracking-wide transition-all"
+              >
+                🎬 Generate Video Preview (Demo)
+              </button>
+            )}
+
+            {isGeneratingVideo && (
+              <div className="bg-white border-2 border-black p-6">
+                <div className="text-center mb-4">
+                  <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent mb-4"></div>
+                  <div className="text-sm font-mono text-black font-bold">
+                    GENERATING VIDEO...
+                  </div>
+                  <div className="text-xs text-black opacity-60 mt-2">
+                    Processing scenes with AI
+                  </div>
+                </div>
+                <div className="bg-gray-200 border-2 border-black h-4 overflow-hidden">
+                  <div
+                    className="bg-black h-full transition-all duration-300"
+                    style={{ width: `${videoProgress}%` }}
+                  />
+                </div>
+                <div className="text-center text-xs font-mono font-bold mt-2">
+                  {videoProgress}%
+                </div>
+              </div>
+            )}
+
+            {videoGenerated && (
+              <div className="bg-white border-2 border-black p-4">
+                <div className="mb-3 text-xs uppercase text-black opacity-60">
+                  ✓ Video Generated Successfully
+                </div>
+                <div className="bg-black aspect-[9/16] max-w-sm mx-auto flex items-center justify-center">
+                  <div className="text-center text-white p-8">
+                    <div className="text-4xl mb-4">🎬</div>
+                    <div className="text-sm font-mono mb-2">MOCK VIDEO</div>
+                    <div className="text-xs opacity-70 mb-4">
+                      {finalist.story.title}
+                    </div>
+                    <div className="text-xs opacity-50">
+                      In production, this would show your<br />
+                      AI-generated video from Runway/Pika
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 text-xs text-black opacity-60 text-center">
+                  Demo preview • Real video generation available with Runway Gen-3 API
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Footer - Export Actions */}
         <div className="border-t-2 border-black bg-white p-4">

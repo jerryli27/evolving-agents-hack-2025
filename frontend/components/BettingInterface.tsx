@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
 import { Finalist } from '@/types';
 
 interface BettingInterfaceProps {
@@ -9,6 +10,7 @@ interface BettingInterfaceProps {
 }
 
 export default function BettingInterface({ finalist, onPlaceBet }: BettingInterfaceProps) {
+  const { login, logout, authenticated, user } = usePrivy();
   const [betAmount, setBetAmount] = useState<number>(0.1);
   const [isPlacingBet, setIsPlacingBet] = useState(false);
   const [betPlaced, setBetPlaced] = useState(false);
@@ -16,6 +18,11 @@ export default function BettingInterface({ finalist, onPlaceBet }: BettingInterf
   const betOptions = [0.1, 0.5, 1.0, 2.5, 5.0];
 
   const handlePlaceBet = async () => {
+    if (!authenticated) {
+      await login();
+      return;
+    }
+
     setIsPlacingBet(true);
     try {
       await onPlaceBet(finalist.story.story_id, betAmount);
@@ -28,12 +35,64 @@ export default function BettingInterface({ finalist, onPlaceBet }: BettingInterf
     }
   };
 
+  const getUserDisplay = () => {
+    if (user?.email?.address) return user.email.address;
+    if (user?.wallet?.address) {
+      return user.wallet.address.slice(0, 6) + '...' + user.wallet.address.slice(-4);
+    }
+    if (user?.google?.email) return user.google.email;
+    return 'User';
+  };
+
+  // Not authenticated - show login prompt
+  if (!authenticated) {
+    return (
+      <div className="bg-white border-2 border-black p-4">
+        <div className="border-b-2 border-black bg-black px-3 py-1.5 -mx-4 -mt-4 mb-4">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-white">
+            Place Bet (SOL)
+          </h3>
+        </div>
+
+        <div className="mb-3 text-xs uppercase text-black opacity-60 text-center">
+          Login to place bets
+        </div>
+
+        <button
+          onClick={login}
+          className="w-full py-3 px-4 bg-black text-white border-2 border-black hover:bg-gray-900 hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 font-bold text-xs uppercase tracking-wide transition-all"
+        >
+          Login with Wallet / Email / Google
+        </button>
+
+        <div className="mt-3 text-xs text-black opacity-60 text-center font-mono">
+          Supports Phantom, Solflare, or create embedded wallet
+        </div>
+      </div>
+    );
+  }
+
+  // Authenticated - show betting interface
   return (
     <div className="bg-white border-2 border-black p-3">
       <div className="border-b-2 border-black bg-black px-3 py-1.5 -mx-3 -mt-3 mb-3">
         <h3 className="text-xs font-bold uppercase tracking-wider text-white">
           Place Bet (SOL)
         </h3>
+      </div>
+
+      {/* User Info */}
+      <div className="mb-3 bg-gray-50 border border-black p-2 flex justify-between items-center">
+        <div className="text-xs font-mono">
+          <span className="opacity-60">LOGGED IN AS:</span>{' '}
+          <span className="font-bold">{getUserDisplay()}</span>
+        </div>
+        <button
+          onClick={logout}
+          className="text-xs underline opacity-60 hover:opacity-100"
+        >
+          Logout
+        </button>
       </div>
 
       {/* Bet Amount Selection */}
@@ -103,7 +162,7 @@ export default function BettingInterface({ finalist, onPlaceBet }: BettingInterf
         {isPlacingBet ? (
           <span className="flex items-center justify-center gap-2">
             <span className="inline-block animate-spin rounded-full h-3 w-3 border-2 border-white border-t-transparent"></span>
-            CONNECTING WALLET...
+            PLACING BET...
           </span>
         ) : betPlaced ? (
           '✓ BET PLACED!'
@@ -112,9 +171,9 @@ export default function BettingInterface({ finalist, onPlaceBet }: BettingInterf
         )}
       </button>
 
-      {/* Wallet Connection Notice */}
+      {/* Note */}
       <div className="mt-3 text-xs text-black opacity-60 text-center font-mono">
-        Connect Phantom or Solflare wallet to place bet
+        {user?.wallet?.address ? 'Using connected wallet' : 'Using embedded wallet'}
       </div>
     </div>
   );
