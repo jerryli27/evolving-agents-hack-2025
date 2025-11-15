@@ -39,4 +39,4 @@ prediction_alignment_prompt = "The following is the summary of the story in an e
 
 qualitative_feedback_aggregation_prompt = "Summarize the following feedback for an episode from a show. The feedback are from different audience so they might repeat or contradict with each other. Summarize them into a bullet list that represent the clustered themes of opinions from the audience and capture the significant patterns.\n {all_feedback}"
 
-prediction_aggregation_prompt = "Summarize the following prediction for the next episode of a show into a bullet list. Capture all the predictions. \n {all_prediction}"
+prediction_aggregation_prompt = "Summarize the following prediction for the next episode of a show into a bullet list. Capture all the predictions. ONLY include predictions. Skip comments about how good or bad the show is and what the audience wants to see or not want to see in future episodes. \n {all_prediction}"

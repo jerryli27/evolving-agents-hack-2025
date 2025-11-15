@@ -1,6 +1,6 @@
 from pathlib import Path
 
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "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"
 KEY_OWNER = "Yi"
 
 DEBUG = False
