@@ -10,6 +10,7 @@ import os
 from dotenv import load_dotenv
 from services.video_export import VideoExportService, VideoBlueprint
 from services.data_loader import get_loader
+from services.seedance_service import get_seedance_service, VideoGenerationRequest
 
 load_dotenv()
 
@@ -180,6 +181,157 @@ async def export_video_format(request: ExportFormatRequest):
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error exporting video: {str(e)}")
+
+
+# ==================== Seedance Video Generation Endpoints ====================
+
+class SeedanceVideoRequest(BaseModel):
+    """Request model for Seedance video generation"""
+    story_id: str
+    title: str
+    script: str
+    prompt: Optional[str] = None  # Custom prompt, or auto-generated from script
+    duration: str = "5"
+    resolution: str = "1080p"
+    aspect_ratio: str = "9:16"
+    use_lite: bool = False  # Use Lite model (faster) vs Pro model (higher quality)
+
+
+@app.post("/api/generate-video-seedance")
+def generate_video_seedance(request: SeedanceVideoRequest):
+    """
+    Generate a video using Seedance (ByteDance) AI model
+
+    This endpoint generates videos synchronously - it waits for the video to complete
+    before returning. For longer videos, consider using the async endpoint.
+
+    Args:
+        request: SeedanceVideoRequest with story details and generation parameters
+
+    Returns:
+        Video URL and metadata
+    """
+    try:
+        seedance = get_seedance_service()
+
+        # If no custom prompt provided, use the script as the prompt
+        # In production, you might want to use the VideoExportService to create
+        # a more structured prompt/beat sheet
+        prompt = request.prompt or request.script[:1000]  # Limit to 1000 chars
+
+        print(f"[API] Generating video for story {request.story_id}")
+        print(f"[API] Prompt length: {len(prompt)} chars")
+
+        result = seedance.generate_video(
+            prompt=prompt,
+            duration=request.duration,
+            resolution=request.resolution,
+            aspect_ratio=request.aspect_ratio,
+            use_lite=request.use_lite
+        )
+
+        return {
+            "video_url": result.video_url,
+            "request_id": result.request_id,
+            "status": result.status,
+            "metadata": result.metadata,
+            "story_id": request.story_id,
+            "title": request.title
+        }
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating video: {str(e)}")
+
+
+@app.post("/api/generate-video-seedance/async")
+async def generate_video_seedance_async(request: SeedanceVideoRequest):
+    """
+    Start async video generation using Seedance
+
+    This endpoint starts video generation and immediately returns a request_id.
+    Use the /status or /result endpoints to check progress and get the final video.
+
+    Args:
+        request: SeedanceVideoRequest with story details
+
+    Returns:
+        request_id for polling status
+    """
+    try:
+        seedance = get_seedance_service()
+
+        prompt = request.prompt or request.script[:1000]
+
+        print(f"[API] Starting async video generation for story {request.story_id}")
+
+        request_id = await seedance.generate_video_async(
+            prompt=prompt,
+            duration=request.duration,
+            resolution=request.resolution,
+            aspect_ratio=request.aspect_ratio,
+            use_lite=request.use_lite
+        )
+
+        return {
+            "request_id": request_id,
+            "status": "processing",
+            "story_id": request.story_id,
+            "title": request.title
+        }
+
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error starting video generation: {str(e)}")
+
+
+@app.get("/api/generate-video-seedance/status/{request_id}")
+async def get_video_status_seedance(request_id: str):
+    """
+    Check the status of an async video generation request
+
+    Args:
+        request_id: The request ID returned from the async endpoint
+
+    Returns:
+        Status information
+    """
+    try:
+        seedance = get_seedance_service()
+        status = await seedance.get_video_status(request_id)
+        return status
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error checking status: {str(e)}")
+
+
+@app.get("/api/generate-video-seedance/result/{request_id}")
+async def get_video_result_seedance(request_id: str):
+    """
+    Get the result of an async video generation request
+
+    Args:
+        request_id: The request ID returned from the async endpoint
+
+    Returns:
+        Video URL and metadata if ready, or error if still processing
+    """
+    try:
+        seedance = get_seedance_service()
+        result = await seedance.get_video_result(request_id)
+
+        return {
+            "video_url": result.video_url,
+            "request_id": result.request_id,
+            "status": result.status,
+            "metadata": result.metadata
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting result: {str(e)}")
+
 
 if __name__ == "__main__":
     import uvicorn
