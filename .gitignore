@@ -193,3 +193,9 @@ node_modules/
 
 # API key settings
 simulation_engine/settings.py
+
+# Ignore all writer data files
+*.json
+
+# But keep the directory structure
+!.gitignore

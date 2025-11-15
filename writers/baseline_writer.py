@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Optional
 from models import StorySubmission
 from tools import SubmitStoryTool
+from feedback_providers import FeedbackProvider
 
 
 class BaselineWriter:
@@ -167,7 +168,7 @@ Finally, Johnny gets a job offer—good salary, fresh start. He could simply mov
         },
     ]
 
-    def __init__(self, writer_id: str, writer_name: str, data_dir: str = "data/writings"):
+    def __init__(self, writer_id: str, writer_name: str, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None):
         """
         Initialize a baseline writer.
 
@@ -175,20 +176,22 @@ Finally, Johnny gets a job offer—good salary, fresh start. He could simply mov
             writer_id: Unique identifier for this writer
             writer_name: Human-readable name
             data_dir: Directory for storing data
+            feedback_provider: Optional feedback provider (defaults to MockFeedbackProvider)
         """
         self.writer_id = writer_id
         self.writer_name = writer_name
         self.data_dir = data_dir
-        self.submit_story_tool = SubmitStoryTool(data_dir)
+        self.submit_story_tool = SubmitStoryTool(data_dir, feedback_provider=feedback_provider)
 
     @classmethod
-    def from_yaml(cls, config_path: str, data_dir: str = "data/writings") -> "BaselineWriter":
+    def from_yaml(cls, config_path: str, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None) -> "BaselineWriter":
         """
         Load a baseline writer from a YAML configuration file.
 
         Args:
             config_path: Path to the YAML config file
             data_dir: Directory for storing data
+            feedback_provider: Optional feedback provider (defaults to MockFeedbackProvider)
 
         Returns:
             BaselineWriter instance
@@ -199,7 +202,8 @@ Finally, Johnny gets a job offer—good salary, fresh start. He could simply mov
         return cls(
             writer_id=config_data["writer_id"],
             writer_name=config_data["writer_name"],
-            data_dir=data_dir
+            data_dir=data_dir,
+            feedback_provider=feedback_provider
         )
 
     def write_round(self, round_num: int) -> StorySubmission:

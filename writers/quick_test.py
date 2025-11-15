@@ -18,7 +18,7 @@ load_dotenv()
 
     # Personality definitions
 PERSONALITIES = {
-    "chronicler": """You are "The Chronicler", a writer who specializes in drama with historical elements.
+    "chronicler": """You are Elena Martinez, a writer who specializes in drama with historical elements.
 Your stories blend real historical events with imaginative character-driven narratives.
 
 When writing:
@@ -28,7 +28,7 @@ When writing:
 - Build stories with strong emotional arcs
 - Learn from your past performance feedback to refine your craft""",
 
-    "dreamweaver": """You are "The Dreamweaver", a writer who specializes in surreal, imaginative drama.
+    "dreamweaver": """You are Maya Chen, a writer who specializes in surreal, imaginative drama.
 Your stories explore the boundaries between reality and fantasy, dreams and waking life.
 You excel at unexpected emotional depth and thought-provoking themes.
 
@@ -40,7 +40,7 @@ When writing:
 - Create stories that linger emotionally in the mind
 - Analyze your feedback to understand what resonates with readers""",
 
-    "minimalist": """You are "The Minimalist", a writer who believes in the power of brevity and dramatic precision.
+    "minimalist": """You are James Park, a writer who believes in the power of brevity and dramatic precision.
 Your stories are concise, every word carefully chosen for maximum emotional impact.
 You specialize in concentrated drama with short, punchy narratives.
 
@@ -52,7 +52,7 @@ When writing:
 - Focus on a single moment of dramatic revelation or transformation
 - Study your feedback to refine your minimalist approach""",
 
-    "realist": """You are "The Realist", a writer who specializes in authentic, slice-of-life drama.
+    "realist": """You are Sofia Rodriguez, a writer who specializes in authentic, slice-of-life drama.
 Your stories capture genuine human experiences with unflinching honesty.
 You excel at creating believable characters facing relatable conflicts.
 
@@ -64,7 +64,7 @@ When writing:
 - Create subtle emotional depth through observation
 - Learn from feedback to refine your realistic approach""",
 
-    "experimenter": """You are "The Experimenter", a writer who pushes the boundaries of dramatic storytelling.
+    "experimenter": """You are Alex Taylor, a writer who pushes the boundaries of dramatic storytelling.
 Your stories challenge conventions and explore unconventional narrative structures.
 You excel at innovative approaches while maintaining emotional resonance.
 
@@ -89,7 +89,9 @@ def quick_test(
     round_num: int = 1,
     writer_id: str = "test_writer",
     feedback_prompt_file: str = None,
-    enable_feedback_tool: bool = True
+    enable_feedback_tool: bool = True,
+    target_num_rounds: int = 5,
+    should_write_sequel: bool = True
 ) -> Union[WriterAgent, BaselineWriter]:
     """
     Quickly test a writer configuration without creating a YAML file.
@@ -142,7 +144,9 @@ def quick_test(
             system_prompt=PERSONALITIES[personality],
             feedback_prompt_file=feedback_prompt_file,
             enable_feedback_tool=enable_feedback_tool,
-            can_see_other_writers=False
+            can_see_other_writers=False,
+            target_num_rounds=target_num_rounds,
+            should_write_sequel=should_write_sequel
         )
 
         # Get API key
@@ -164,6 +168,10 @@ def quick_test(
         print(f"  Feedback Prompt: {feedback_prompt_file if enable_feedback_tool else 'Disabled'}")
         print(f"  LLM: {llm_provider} - {model} (temp={temperature})")
         print(f"  Round: {round_num}")
+        if should_write_sequel:
+            print(f"  Series: {target_num_rounds}-part sequel series")
+        else:
+            print(f"  Series: Standalone stories")
         print(f"{'='*70}\n")
 
         writer = WriterAgent(config, api_key=api_key, data_dir="data/test_writings")
@@ -234,6 +242,17 @@ if __name__ == "__main__":
         action="store_true",
         help="Disable the feedback incorporation tool"
     )
+    parser.add_argument(
+        "--target-rounds",
+        type=int,
+        default=5,
+        help="Number of rounds/stories in the series (default: 5)"
+    )
+    parser.add_argument(
+        "--standalone",
+        action="store_true",
+        help="Write standalone stories instead of sequels"
+    )
 
     args = parser.parse_args()
 
@@ -249,5 +268,7 @@ if __name__ == "__main__":
         temperature=args.temperature,
         round_num=args.round,
         feedback_prompt_file=args.feedback_prompt,
-        enable_feedback_tool=not args.disable_feedback_tool
+        enable_feedback_tool=not args.disable_feedback_tool,
+        target_num_rounds=args.target_rounds,
+        should_write_sequel=not args.standalone
     )

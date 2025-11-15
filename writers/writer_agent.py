@@ -7,12 +7,13 @@ from typing import Optional
 from models import WriterConfig, StorySubmission
 from llm_apis import LLMClientFactory, Message, ToolDefinition
 from tools import PastWritingsTool, SubmitStoryTool, FeedbackIncorporationTool
+from feedback_providers import FeedbackProvider
 
 
 class WriterAgent:
     """An autonomous LLM-powered writer agent."""
 
-    def __init__(self, config: WriterConfig, api_key: Optional[str] = None, data_dir: str = "data/writings"):
+    def __init__(self, config: WriterConfig, api_key: Optional[str] = None, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None):
         """
         Initialize a writer agent.
 
@@ -20,6 +21,7 @@ class WriterAgent:
             config: Writer configuration
             api_key: Optional API key for the LLM provider
             data_dir: Directory for storing data
+            feedback_provider: Optional feedback provider (defaults to MockFeedbackProvider)
         """
         self.config = config
         self.llm_client = LLMClientFactory.create_client(
@@ -30,7 +32,7 @@ class WriterAgent:
 
         # Initialize tools
         self.past_writings_tool = PastWritingsTool(data_dir)
-        self.submit_story_tool = SubmitStoryTool(data_dir)
+        self.submit_story_tool = SubmitStoryTool(data_dir, feedback_provider=feedback_provider)
         self.feedback_tool = FeedbackIncorporationTool(config.feedback_prompt_file) if config.enable_feedback_tool else None
 
         # Load and build the complete system prompt
@@ -40,7 +42,7 @@ class WriterAgent:
         self.conversation_history: list[Message] = []
 
     @classmethod
-    def from_yaml(cls, config_path: str, api_key: Optional[str] = None, data_dir: str = "data/writings") -> "WriterAgent":
+    def from_yaml(cls, config_path: str, api_key: Optional[str] = None, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None) -> "WriterAgent":
         """
         Load a writer agent from a YAML configuration file.
 
@@ -48,6 +50,7 @@ class WriterAgent:
             config_path: Path to the YAML config file
             api_key: Optional API key for the LLM provider
             data_dir: Directory for storing data
+            feedback_provider: Optional feedback provider (defaults to MockFeedbackProvider)
 
         Returns:
             WriterAgent instance
@@ -56,7 +59,7 @@ class WriterAgent:
             config_data = yaml.safe_load(f)
 
         config = WriterConfig(**config_data)
-        return cls(config, api_key, data_dir)
+        return cls(config, api_key, data_dir, feedback_provider)
 
     def _build_system_prompt(self) -> str:
         """
@@ -68,12 +71,21 @@ class WriterAgent:
         # Add content from prompt file if specified
         if self.config.prompt_file:
             prompt_path = Path(self.config.prompt_file)
+
+            # Try multiple locations for the prompt file
+            if not prompt_path.exists():
+                # Try prepending 'writers/' for when running from root directory
+                alt_path = Path('writers') / self.config.prompt_file
+                if alt_path.exists():
+                    prompt_path = alt_path
+
             if prompt_path.exists():
                 with open(prompt_path, 'r', encoding='utf-8') as f:
                     prompt_content = f.read()
                     parts.append(prompt_content)
             else:
-                print(f"Warning: prompt_file '{self.config.prompt_file}' not found. Skipping.")
+                # Only warn, don't fail - system_prompt is still available
+                pass  # Silently skip missing prompt files
 
         # Add the base system prompt
         if self.config.system_prompt:
@@ -94,6 +106,74 @@ class WriterAgent:
             tools.append(ToolDefinition(**self.feedback_tool.get_tool_definition()))
 
         return tools
+
+    def _build_round_prompt(self, round_num: int, tools_list: list[str]) -> str:
+        """Build the initial round prompt with sequel-aware instructions."""
+
+        # Base introduction
+        prompt = f"You are {self.config.writer_name}, a creative writer. "
+
+        # Add sequel context if enabled
+        if self.config.should_write_sequel:
+            if round_num == 1:
+                prompt += (
+                    f"You are beginning a {self.config.target_num_rounds}-part story series. "
+                    f"This is Round {round_num} of {self.config.target_num_rounds}.\n\n"
+                    f"IMPORTANT: You are writing the FIRST story in a connected series. "
+                    f"Set up characters, world, and conflicts that will develop across {self.config.target_num_rounds} stories. "
+                    f"End with hooks that make readers want to continue the series.\n\n"
+                )
+            elif round_num < self.config.target_num_rounds:
+                prompt += (
+                    f"You are continuing your {self.config.target_num_rounds}-part story series. "
+                    f"This is Round {round_num} of {self.config.target_num_rounds}.\n\n"
+                    f"IMPORTANT: This is a SEQUEL building on your previous stories. "
+                    f"Continue character arcs, develop ongoing plot threads, and maintain consistency with established canon. "
+                    f"You still have {self.config.target_num_rounds - round_num} more stories after this one.\n\n"
+                )
+            elif round_num == self.config.target_num_rounds:
+                prompt += (
+                    f"You are writing the FINAL story in your {self.config.target_num_rounds}-part series. "
+                    f"This is Round {round_num} of {self.config.target_num_rounds}.\n\n"
+                    f"IMPORTANT: This is the CONCLUSION of your story series. "
+                    f"Resolve major plot threads, deliver satisfying character conclusions, and provide closure "
+                    f"while staying true to everything you've established.\n\n"
+                )
+            else:  # Beyond target rounds
+                prompt += (
+                    f"You have completed your planned {self.config.target_num_rounds}-part series. "
+                    f"This is Round {round_num} (BONUS CONTENT).\n\n"
+                    f"IMPORTANT: Write additional content that expands the universe. This could be a spin-off, "
+                    f"prequel, sequel, or side story that enriches the world you've built.\n\n"
+                )
+        else:
+            # Standalone stories
+            prompt += (
+                f"It's now Round {round_num}. Your task is to write a short story synopsis.\n\n"
+                f"Each story you write is STANDALONE - no need for continuity with previous rounds.\n\n"
+            )
+
+        # Add tools and process
+        prompt += (
+            f"You have access to the following tools:\n"
+            f"{chr(10).join(tools_list)}\n\n"
+            f"Process:\n"
+            f"1. (Optional) Review your past writings to learn from feedback"
+        )
+
+        if self.feedback_tool:
+            prompt += (
+                f"\n2. (Optional) Access the feedback framework for strategic guidance on interpretation"
+                f"\n3. Write your story"
+                f"\n4. Submit your story using the submit_story tool\n\n"
+            )
+        else:
+            prompt += (
+                f"\n2. Write your story"
+                f"\n3. Submit your story using the submit_story tool\n\n"
+            )
+
+        return prompt
 
     def _handle_tool_call(self, tool_name: str, tool_input: dict) -> str:
         """Execute a tool call and return the result."""
@@ -150,27 +230,8 @@ class WriterAgent:
             tools_list.insert(1, "2. get_feedback_framework - Access strategic guidance on incorporating market feedback")
             tools_list[2] = "3. submit_story - Submit your completed story and receive feedback"
 
-        initial_prompt = (
-            f"You are {self.config.writer_name}, a creative writer. "
-            f"It's now Round {round_num}. Your task is to write a short story synopsis.\n\n"
-            f"You have access to the following tools:\n"
-            f"{chr(10).join(tools_list)}\n\n"
-            f"Process:\n"
-            f"1. (Optional) Review your past writings to learn from feedback\n"
-        )
-
-        if self.feedback_tool:
-            initial_prompt += (
-                f"2. (Optional) Access the feedback framework for strategic guidance on interpretation\n"
-                f"3. Write your story\n"
-                f"4. Submit your story using the submit_story tool\n\n"
-            )
-        else:
-            initial_prompt += (
-                f"2. Write your story\n"
-                f"3. Submit your story using the submit_story tool\n\n"
-            )
-
+        # Build sequel-aware prompt
+        initial_prompt = self._build_round_prompt(round_num, tools_list)
         initial_prompt += "Begin writing!"
 
         self.conversation_history.append(Message(role="user", content=initial_prompt))
