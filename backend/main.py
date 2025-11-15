@@ -9,6 +9,7 @@ from pydantic import BaseModel
 import os
 from dotenv import load_dotenv
 from services.video_export import VideoExportService, VideoBlueprint
+from services.data_loader import get_loader
 
 load_dotenv()
 
@@ -21,11 +22,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://*.vercel.app",
-        os.getenv("FRONTEND_URL", ""),
-    ],
+    allow_origins=["*"],  # Allow all origins for now - can restrict later
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,17 +45,11 @@ def get_writers():
     Returns:
         List of writer objects with id, name, description, style_dna, etc.
     """
-    # TODO: Replace with real data from your writer agent system
-    return [
-        {
-            "writer_id": "writer_1",
-            "name": "Melodrama Maven",
-            "description": "Specializes in emotional arcs and tearjerker moments",
-            "style_dna": "high-emotion, character-driven, romantic tension",
-            "total_score": 425,
-            "color": "#3B82F6"
-        }
-    ]
+    try:
+        loader = get_loader()
+        return loader.load_writers()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading writers: {str(e)}")
 
 @app.get("/api/rounds")
 def get_rounds():
@@ -68,34 +59,11 @@ def get_rounds():
     Returns:
         List of round objects containing stories with scores and feedback
     """
-    # TODO: Replace with real rounds data
-    return [
-        {
-            "round": 1,
-            "stories": [
-                {
-                    "story_id": "story_1",
-                    "writer_id": "writer_1",
-                    "round": 1,
-                    "title": "Sample Story",
-                    "logline": "A compelling short drama",
-                    "excerpt": "Opening scene...",
-                    "full_script": "Full script content...",
-                    "score": {
-                        "composite": 85.0,
-                        "reader_alignment": 82.0,
-                        "novelty": 88.0,
-                        "coherence": 86.0
-                    },
-                    "reader_feedback": {
-                        "summary": "Strong emotional resonance",
-                        "tags": ["emotional", "engaging"],
-                        "detailed_comments": "Great character development"
-                    }
-                }
-            ]
-        }
-    ]
+    try:
+        loader = get_loader()
+        return loader.load_rounds()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading rounds: {str(e)}")
 
 @app.get("/api/finalists")
 def get_finalists(n: int = Query(default=3, ge=1, le=10)):
@@ -108,24 +76,11 @@ def get_finalists(n: int = Query(default=3, ge=1, le=10)):
     Returns:
         List of finalist objects with story and writer details
     """
-    # TODO: Replace with real finalists logic
-    return [
-        {
-            "story": {
-                "story_id": "story_winner",
-                "writer_id": "writer_1",
-                "title": "The Winner",
-                "logline": "An incredible story",
-                "score": {"composite": 95.0}
-            },
-            "writer": {
-                "writer_id": "writer_1",
-                "name": "Champion Writer",
-                "color": "#3B82F6"
-            },
-            "ranking": 1
-        }
-    ]
+    try:
+        loader = get_loader()
+        return loader.load_finalists(n=n)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error loading finalists: {str(e)}")
 
 class VideoExportRequest(BaseModel):
     """Request model for video export"""

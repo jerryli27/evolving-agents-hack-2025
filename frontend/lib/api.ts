@@ -8,12 +8,19 @@ import { WRITERS, ROUNDS, FINALISTS } from './mockData';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 const USE_MOCK_DATA = !API_URL || process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
+// Debug: Log API configuration
+console.log('[API CONFIG] NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+console.log('[API CONFIG] API_URL:', API_URL);
+console.log('[API CONFIG] USE_MOCK_DATA:', USE_MOCK_DATA);
+
 // Helper function to handle API requests with fallback to mock data
 async function fetchWithFallback<T>(
   endpoint: string,
   mockData: T,
   options?: RequestInit
 ): Promise<T> {
+  console.log(`[API] fetchWithFallback called for ${endpoint}, USE_MOCK_DATA=${USE_MOCK_DATA}`);
+
   if (USE_MOCK_DATA) {
     console.log(`[API] Using mock data for ${endpoint}`);
     // Simulate network delay
@@ -22,7 +29,10 @@ async function fetchWithFallback<T>(
   }
 
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const url = `${API_URL}${endpoint}`;
+    console.log(`[API] Fetching from ${url}`);
+
+    const response = await fetch(url, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -30,11 +40,15 @@ async function fetchWithFallback<T>(
       },
     });
 
+    console.log(`[API] Response status: ${response.status} ${response.statusText}`);
+
     if (!response.ok) {
       throw new Error(`API request failed: ${response.statusText}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log(`[API] Successfully fetched data from ${endpoint}:`, data);
+    return data;
   } catch (error) {
     console.warn(`[API] Failed to fetch ${endpoint}, using mock data:`, error);
     return mockData;
