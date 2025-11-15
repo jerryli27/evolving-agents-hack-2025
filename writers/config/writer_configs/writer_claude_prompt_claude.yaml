@@ -1,5 +1,5 @@
-writer_id: "writer_claude_test"
-writer_name: "Claude Drama Specialist"
+writer_id: "writer_claude_prompt_claude"
+writer_name: "Claude Writer with Claude Prompt"
 llm_provider: "anthropic"
 llm_config:
   model: "claude-sonnet-4-20250514"

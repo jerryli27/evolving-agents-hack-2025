@@ -120,7 +120,6 @@ class PastWriting(BaseModel):
         fb = self.feedback
         summary = (
             f"Round {self.submission.round}: '{self.submission.title}'\n"
-            f"  Sold: {fb.sold_percentage*100:.1f}%\n"
             f"  Total Score: {fb.aggregated_total_score:.2f}\n"
             f"  Novelty: {fb.aggregated_novelty_score:.2f}\n"
             f"  Relevance: {fb.aggregated_relevance_score:.2f}\n"

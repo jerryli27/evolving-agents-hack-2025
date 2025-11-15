@@ -18,12 +18,12 @@ Analyze your feedback using the 4-scenario framework:
 
 **Identify Your Scenario:**
 
-Write out: "My feedback shows: [Sold %] readers purchased, [Score] overall quality."
+Write out: "My feedback shows: [Score] overall quality, [Reader feedback intensity level]."
 
 Then identify which scenario applies:
 
-#### Scenario 1: High Engagement + High Conversion (Sold >50%, Score >0.7)
-**What it means**: You've found a winning formula. The concept resonates emotionally AND has commercial appeal.
+#### Scenario 1: High Quality + Strong Reader Response (Score >0.7, Strong qualitative feedback)
+**What it means**: You've found a winning formula. The concept resonates emotionally AND generates deep reader engagement.
 
 **What to do**:
 - Analyze what worked: theme, conflict type, character dynamics, setting
@@ -31,8 +31,8 @@ Then identify which scenario applies:
 - Consider variations on this successful pattern (different setting, similar conflict structure)
 - Balance repetition with innovation—audiences want "the same but different"
 
-#### Scenario 2: High Engagement + Low Conversion (Sold <30%, Score >0.6)
-**What it means**: People find your story interesting but not compelling enough to invest money. Often indicates the concept feels familiar, safe, or lacks a unique hook.
+#### Scenario 2: High Quality + Weak Reader Response (Score >0.6, Weak qualitative feedback)
+**What it means**: The execution is solid but readers aren't connecting deeply. Often indicates the concept feels familiar, safe, or lacks a unique hook.
 
 **What to do**:
 - Add a distinctive twist or unexpected element
@@ -41,8 +41,8 @@ Then identify which scenario applies:
 - Consider: Is the emotional payoff clear and powerful enough?
 - Test whether your theme is too abstract—ground it in specific, visceral details
 
-#### Scenario 3: Low Engagement + High Conversion (Sold >40%, Score <0.5)
-**What it means**: A niche audience is very interested, but the concept doesn't have broad appeal. This is actually valuable—you've found a dedicated audience.
+#### Scenario 3: Lower Quality + Strong Reader Response (Score <0.5, Strong qualitative feedback)
+**What it means**: A niche audience is deeply engaged despite execution issues. You've tapped into something compelling that resonates with specific readers.
 
 **What to do**:
 - You may have found a specific niche worth serving
@@ -50,7 +50,7 @@ Then identify which scenario applies:
 - To broaden: Make the premise more accessible, use more universal emotions
 - To deepen: Double down on what makes this unique for your specific audience
 
-#### Scenario 4: Low Engagement + Low Conversion (Sold <30%, Score <0.5)
+#### Scenario 4: Lower Quality + Weak Reader Response (Score <0.5, Weak qualitative feedback)
 **What it means**: The concept isn't connecting. This is valuable information, not failure.
 
 **What to do**:
@@ -172,7 +172,7 @@ Use `submit_story` with your revised draft.
 
 ---
 
-## Balancing Art and Commerce
+## Balancing Art and Reader Connection
 
 ### The Creative Integrity Check
 
@@ -193,11 +193,11 @@ Ask yourself: "Am I still writing what I find meaningful, or am I just chasing m
 ### The Portfolio Approach
 
 Consider your iterations as a portfolio:
-- **60-70%**: Test and refine concepts with strong commercial signals
+- **60-70%**: Test and refine concepts with strong reader engagement signals
 - **20-30%**: Experiment with concepts you're passionate about
 - **10-20%**: Take creative risks that might surprise you
 
-This balance lets you learn from the market while maintaining artistic growth.
+This balance lets you learn from reader feedback while maintaining artistic growth.
 
 ---
 
@@ -207,7 +207,7 @@ This balance lets you learn from the market while maintaining artistic growth.
 
 **Principle 2**: Speed matters. Don't agonize over each iteration. Generate, test, learn, repeat. Momentum builds skill.
 
-**Principle 3**: Your best work often comes from synthesizing market insights with personal passion. Neither pure commercial calculation nor pure artistic isolation tends to produce great drama.
+**Principle 3**: Your best work often comes from synthesizing reader feedback insights with personal passion. Neither pure metric optimization nor pure artistic isolation tends to produce great drama.
 
 **Principle 4**: Every iteration should teach you something. If you're not learning, you're not asking the right questions about the feedback.
 

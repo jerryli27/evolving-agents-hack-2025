@@ -1,8 +1,8 @@
-writer_id: "writer_chatgpt_test"
-writer_name: "ChatGPT Drama Specialist"
-llm_provider: "anthropic"
+writer_id: "writer_gpt_prompt_gpt"
+writer_name: "GPT Writer with GPT Prompt"
+llm_provider: "openai"
 llm_config:
-  model: "claude-sonnet-4-20250514"
+  model: "gpt-4o"
   temperature: 0.8
   max_tokens: 4096
   extra_params: {}

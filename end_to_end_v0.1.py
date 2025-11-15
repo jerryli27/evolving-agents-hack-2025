@@ -304,11 +304,24 @@ Examples:
 
     if args.writers:
         # Load specific writers
+        import yaml
+        from pathlib import Path
+        
         for writer_file in args.writers:
             try:
-                api_key = os.environ.get("ANTHROPIC_API_KEY")
+                # Determine which API key to use based on the provider in the config
+                config_path = Path("writers/config/writer_configs") / writer_file
+                with open(config_path, 'r') as f:
+                    config_data = yaml.safe_load(f)
+                
+                provider = config_data.get('llm_provider', 'anthropic').lower()
+                if provider == 'openai':
+                    api_key = os.environ.get("OPENAI_API_KEY")
+                else:  # anthropic or default
+                    api_key = os.environ.get("ANTHROPIC_API_KEY")
+                
                 orchestrator.load_writer(writer_file, api_key=api_key, is_baseline=False)
-                print(f"  ✓ Loaded: {writer_file}")
+                print(f"  ✓ Loaded: {writer_file} (provider: {provider})")
             except Exception as e:
                 print(f"  ✗ Failed to load {writer_file}: {e}")
     else:

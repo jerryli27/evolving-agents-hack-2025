@@ -66,21 +66,40 @@ class WriterAgent:
         config = WriterConfig(**config_data)
         return cls(config, api_key, data_dir, feedback_provider, transcript_dir)
 
-    def _build_system_prompt(self) -> str:
+    def _build_system_prompt(self, round_num: int = 1) -> str:
         """
         Build the complete system prompt by combining the base system_prompt
-        with content from prompt_file if specified.
+        with content from prompt_file (round 1) or feedback_prompt_file (round 2+).
+        
+        Args:
+            round_num: The current round number (default 1)
+            
+        Returns:
+            Combined system prompt string
         """
         parts = []
 
-        # Add content from prompt file if specified
-        if self.config.prompt_file:
-            prompt_path = Path(self.config.prompt_file)
+        # Determine which prompt file to use based on round number
+        prompt_file_to_use = None
+        if round_num == 1:
+            # Round 1: Use initial prompt file
+            if self.config.prompt_file:
+                prompt_file_to_use = self.config.prompt_file
+        else:
+            # Round 2+: Use feedback prompt file if available, otherwise fall back to prompt_file
+            if self.config.feedback_prompt_file:
+                prompt_file_to_use = self.config.feedback_prompt_file
+            elif self.config.prompt_file:
+                prompt_file_to_use = self.config.prompt_file
+
+        # Load the selected prompt file
+        if prompt_file_to_use:
+            prompt_path = Path(prompt_file_to_use)
 
             # Try multiple locations for the prompt file
             if not prompt_path.exists():
                 # Try prepending 'writers/' for when running from root directory
-                alt_path = Path('writers') / self.config.prompt_file
+                alt_path = Path('writers') / prompt_file_to_use
                 if alt_path.exists():
                     prompt_path = alt_path
 
@@ -106,8 +125,10 @@ class WriterAgent:
             ToolDefinition(**self.submit_story_tool.get_tool_definition()),
         ]
 
-        # Add feedback tool if enabled
-        if self.feedback_tool:
+        # Add feedback tool if enabled, but auto-disable if using round-based prompts
+        # (when both prompt_file and feedback_prompt_file are specified, feedback is in system prompt instead)
+        use_round_based_prompts = self.config.prompt_file and self.config.feedback_prompt_file
+        if self.feedback_tool and not use_round_based_prompts:
             tools.append(ToolDefinition(**self.feedback_tool.get_tool_definition()))
 
         return tools
@@ -166,7 +187,11 @@ class WriterAgent:
             f"1. (Optional) Review your past writings to learn from feedback"
         )
 
-        if self.feedback_tool:
+        # Check if feedback tool is available (respects round-based prompt logic)
+        use_round_based_prompts = self.config.prompt_file and self.config.feedback_prompt_file
+        feedback_tool_available = self.feedback_tool and not use_round_based_prompts
+        
+        if feedback_tool_available:
             prompt += (
                 f"\n2. (Optional) Access the feedback framework for strategic guidance on interpretation"
                 f"\n3. Write your story"
@@ -227,13 +252,20 @@ class WriterAgent:
         self.conversation_history = []
         self._iteration_log = []  # Track each iteration for debugging
 
+        # Build round-specific system prompt
+        round_system_prompt = self._build_system_prompt(round_num)
+
         # Initial prompt
         tools_list = [
             "1. get_past_writings - View your past stories and their performance",
             "2. submit_story - Submit your completed story and receive feedback"
         ]
 
-        if self.feedback_tool:
+        # Check if feedback tool is available (respects round-based prompt logic)
+        use_round_based_prompts = self.config.prompt_file and self.config.feedback_prompt_file
+        feedback_tool_available = self.feedback_tool and not use_round_based_prompts
+        
+        if feedback_tool_available:
             tools_list.insert(1, "2. get_feedback_framework - Access strategic guidance on incorporating market feedback")
             tools_list[2] = "3. submit_story - Submit your completed story and receive feedback"
 
@@ -255,11 +287,11 @@ class WriterAgent:
                 "input_messages": [{"role": m.role, "content": m.content} for m in self.conversation_history],
             }
 
-            # Generate response
+            # Generate response using round-specific system prompt
             response = self.llm_client.generate(
                 messages=self.conversation_history,
                 tools=self._get_tools(),
-                system=self.system_prompt,
+                system=round_system_prompt,
             )
 
             # Log response
@@ -324,7 +356,7 @@ class WriterAgent:
 
         # Save transcript if requested
         if save_transcript:
-            self._save_transcript(round_num, submitted_story is not None)
+            self._save_transcript(round_num, submitted_story is not None, round_system_prompt)
 
         if not submitted_story:
             raise RuntimeError(
@@ -333,7 +365,7 @@ class WriterAgent:
 
         return submitted_story
 
-    def _save_transcript(self, round_num: int, success: bool):
+    def _save_transcript(self, round_num: int, success: bool, round_system_prompt: str):
         """Save the full conversation transcript for debugging."""
         from datetime import datetime
 
@@ -355,8 +387,9 @@ class WriterAgent:
                 "model": self.config.llm_config.model,
                 "temperature": self.config.llm_config.temperature,
                 "prompt_file": self.config.prompt_file,
+                "feedback_prompt_file": self.config.feedback_prompt_file,
             },
-            "system_prompt": self.system_prompt,
+            "system_prompt": round_system_prompt,  # Save the round-specific prompt that was actually used
             "iterations": self._iteration_log,
             "final_conversation": [
                 {"role": m.role, "content": m.content}

@@ -16,20 +16,20 @@ Execute `get_past_writings` to acquire historical performance data. This is non-
 
 Process all feedback through the dual-channel analysis framework:
 
-**Signal 1: "Likes" (Breadth of Appeal)**
+**Signal 1: "Engagement" (Breadth of Appeal)**
 - Metric: Aggregated scores (Novelty, Relevance, Quality)
 - Threshold: High = >0.6, Low = ≤0.6
 
-**Signal 2: "Money" (Depth of Value / Conversion)**  
-- Metric: Sold percentage
-- Threshold: High = >40%, Low = ≤40%
+**Signal 2: "Impact" (Depth of Reader Connection)**
+- Metric: Reader feedback intensity and depth
+- Threshold: High = Strong qualitative feedback, Low = Weak or minimal feedback
 
 **CLASSIFY YOUR PREVIOUS ATTEMPT:**
 
 Write out explicitly:
 
 **Data Points:**
-- Sold Percentage: [X]%
+- Reader Feedback Intensity: [Strong/Moderate/Weak based on qualitative comments]
 - Overall Score: [X]/1.00
 - Novelty Score: [X]/1.00
 - Relevance Score: [X]/1.00
@@ -39,28 +39,28 @@ Write out explicitly:
 
 | Quadrant | Signal Pattern | My Classification |
 |----------|---------------|-------------------|
-| **1. The Winner** | High Likes (>0.6) / High Money (>40%) | [ ] YES / [ ] NO |
-| **2. The Niche Hit** | Low Likes (≤0.6) / High Money (>40%) | [ ] YES / [ ] NO |
-| **3. The Crowd-Pleaser** | High Likes (>0.6) / Low Money (≤40%) | [ ] YES / [ ] NO |
-| **4. The Misfire** | Low Likes (≤0.6) / Low Money (≤40%) | [ ] YES / [ ] NO |
+| **1. The Winner** | High Engagement (>0.6) / High Impact (Strong feedback) | [ ] YES / [ ] NO |
+| **2. The Niche Hit** | Low Engagement (≤0.6) / High Impact (Strong feedback) | [ ] YES / [ ] NO |
+| **3. The Crowd-Pleaser** | High Engagement (>0.6) / Low Impact (Weak feedback) | [ ] YES / [ ] NO |
+| **4. The Misfire** | Low Engagement (≤0.6) / Low Impact (Weak feedback) | [ ] YES / [ ] NO |
 
 **Strategic Directive Based on Classification:**
 
 Write which quadrant applies and follow its directive:
 
 #### Quadrant 1: The Winner
-**Analysis:** Optimal result. Concept possesses both broad appeal and high perceived value.
+**Analysis:** Optimal result. Concept possesses both broad appeal and deep reader connection.
 **Directive:** ANALYZE & EXPLOIT. This concept becomes the new baseline. Cease broad exploration. Subsequent attempts become variations on this successful model. Identify and isolate core components (genre, theme, stakes) to replicate.
 
-#### Quadrant 2: The Niche Hit  
-**Analysis:** High-value signal. Concept has low-affinity, high-value profile. Strongly resonates with specific, dedicated audience.
+#### Quadrant 2: The Niche Hit
+**Analysis:** Strong reader impact signal. Concept has focused appeal but deep resonance. Strongly connects with specific, engaged audience.
 **Directive:** STRATEGIC CHOICE:
 - **A) Double Down:** Serve this proven niche. Next attempt should be MORE targeted to this audience.
-- **B) Hybridize:** Merge "Money" elements from this concept with "Like" elements from a previous "Crowd-Pleaser" to pursue a "Winner."
+- **B) Hybridize:** Merge "Impact" elements from this concept with "Engagement" elements from a previous "Crowd-Pleaser" to pursue a "Winner."
 
 #### Quadrant 3: The Crowd-Pleaser
-**Analysis:** "Likable-but-Not-Urgent." Core hook is engaging, but stakes or perceived value too low to drive conversion.
-**Directive:** HYPOTHESIZE & ADJUST. Isolate the "Like" elements. Form hypothesis on "Low Money" cause (e.g., low stakes, common premise). Next attempt is iteration of THIS SAME SYNOPSIS with hypothesized variable adjusted.
+**Analysis:** "Engaging-but-Not-Memorable." Core hook is engaging, but emotional impact or depth too low to generate strong reader feedback.
+**Directive:** HYPOTHESIZE & ADJUST. Isolate the "Engagement" elements. Form hypothesis on "Low Impact" cause (e.g., low stakes, shallow emotions, common premise). Next attempt is iteration of THIS SAME SYNOPSIS with hypothesized variable adjusted.
 
 #### Quadrant 4: The Misfire
 **Analysis:** Failed test. Concept and/or execution failed to connect on either metric.
@@ -68,7 +68,7 @@ Write which quadrant applies and follow its directive:
 
 **MY CLASSIFICATION:** [Write which quadrant and which directive]
 
-**MY HYPOTHESIS:** [If Quadrant 3, state hypothesis about low money cause. If Quadrant 4, state why pivot is needed. If Quadrant 2, state which strategic choice.]
+**MY HYPOTHESIS:** [If Quadrant 3, state hypothesis about low impact cause. If Quadrant 4, state why pivot is needed. If Quadrant 2, state which strategic choice.]
 
 ### Step 3: Campaign Phase Identification & Strategy (REQUIRED)
 
@@ -143,13 +143,13 @@ Display entire draft.
 Evaluate draft against matrix optimization criteria:
 
 **Problem 1:** [Specific weakness]
-- Impact on "Likes" signal: [How this reduces broad appeal]
-- Impact on "Money" signal: [How this reduces conversion]
+- Impact on "Engagement" signal: [How this reduces broad appeal]
+- Impact on "Impact" signal: [How this reduces reader connection depth]
 - Optimization target: [Which signal this fix prioritizes]
 
 **Problem 2:** [Specific weakness]
-- Impact on "Likes" signal: [How this reduces broad appeal]
-- Impact on "Money" signal: [How this reduces conversion]
+- Impact on "Engagement" signal: [How this reduces broad appeal]
+- Impact on "Impact" signal: [How this reduces reader connection depth]
 - Optimization target: [Which signal this fix prioritizes]
 
 **Fix Prioritization:** [Based on current phase and quadrant directive, which problem fix is higher priority?]
@@ -165,7 +165,7 @@ Verify against criteria:
 - [ ] Immediate signal: Genre/tone clear in opening
 - [ ] Conflict presentation: Stakes evident early
 - [ ] Scope constraint: Single character/moment/focus
-- [ ] Matrix alignment: Fixes target correct signal (Likes/Money) based on quadrant
+- [ ] Matrix alignment: Fixes target correct signal (Engagement/Impact) based on quadrant
 - [ ] Phase alignment: Approach matches exploration/refinement/optimization strategy
 
 ### Step 8: Submission (REQUIRED)
@@ -177,7 +177,7 @@ Execute `submit_story` with revised draft.
 ## Campaign Management Principles
 
 ### Objectify Feedback
-Treat "Likes" and "Money" as data points, not judgments. Emotion about results reduces analytical clarity.
+Treat "Engagement" and "Impact" as data points, not judgments. Emotion about results reduces analytical clarity.
 
 ### Classify Systematically
 Use the Feedback Matrix for every decision. Do not rely on intuition.
@@ -185,8 +185,8 @@ Use the Feedback Matrix for every decision. Do not rely on intuition.
 ### Fail Efficiently
 Discard "Misfires" immediately. Do not commit resources to failed iterations. Sunk cost fallacy is the enemy of optimization.
 
-### Value Conversion Over Breadth
-A "Niche Hit" (Low Likes / High Money) is a more valuable and actionable signal than a "Crowd-Pleaser" (High Likes / Low Money). Money is the terminal metric.
+### Value Reader Connection Over Breadth
+A "Niche Hit" (Low Engagement / High Impact) is a more valuable and actionable signal than a "Crowd-Pleaser" (High Engagement / Low Impact). Deep reader connection is the terminal metric.
 
 ### Adapt Strategy Dynamically
 Shift from "Exploration" to "Refinement" or "Optimization" as soon as data provides a clear path. Do not remain in exploration mode past Round 5 without justification.

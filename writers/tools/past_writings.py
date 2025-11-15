@@ -91,7 +91,7 @@ class PastWritingsTool:
             "description": (
                 "Access your past story submissions and their performance metrics. "
                 "This includes your previous stories, titles, and feedback scores "
-                "(sales percentage, novelty, relevance, quality, and qualitative feedback)."
+                "(total score, novelty, relevance, quality, and qualitative feedback from readers)."
             ),
             "input_schema": {
                 "type": "object",

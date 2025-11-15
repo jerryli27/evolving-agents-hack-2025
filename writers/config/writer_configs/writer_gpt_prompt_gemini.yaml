@@ -1,8 +1,8 @@
-writer_id: "writer_gemini_test"
-writer_name: "Gemini Drama Specialist"
-llm_provider: "anthropic"
+writer_id: "writer_gpt_prompt_gemini"
+writer_name: "GPT Writer with Gemini Prompt"
+llm_provider: "openai"
 llm_config:
-  model: "claude-sonnet-4-20250514"
+  model: "gpt-4o"
   temperature: 0.8
   max_tokens: 4096
   extra_params: {}

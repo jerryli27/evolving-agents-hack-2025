@@ -20,10 +20,10 @@ Analyze your feedback using the practical to-do list framework:
 
 Write out your analysis for each category:
 
-#### Market Response:
-- Sold percentage: [X]%
+#### Reader Feedback Response:
 - Overall score: [X]/1.00
 - Pattern: [Is this improving, declining, or stable?]
+- Reader engagement level: [High/Medium/Low based on score]
 
 #### Emotional Signals:
 - Novelty score: [X] → What this means: [readers found it fresh/predictable]

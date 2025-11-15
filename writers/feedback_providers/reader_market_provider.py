@@ -97,7 +97,7 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         raw_feedback = []
         for feedback in aggregated_feedback.get('raw_feedback', []):
             reader_feedback = ReaderFeedback(
-                reader_id=f"{feedback['reader_agent'].scratch.get('first_name', '')} {feedback['reader_agent'].scratch.get('last_name', '')}",
+                reader_id=feedback['reader_agent'],
                 total_score=feedback['total_score'],
                 novelty=feedback['novelty'],
                 relevance=feedback['relevance'],
@@ -135,7 +135,7 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         # Collect all feedback
         all_feedback = []
         for feedback in raw_feedback_list:
-            reader_name = f"{feedback['reader_agent'].scratch.get('first_name', '')} {feedback['reader_agent'].scratch.get('last_name', '')}"
+            reader_name = feedback['reader_agent']
             all_feedback.append(f"{reader_name}: {feedback['qualitative_feedback']}")
 
         # Return first few as a sample, or all if there are only a few
