@@ -26,7 +26,7 @@ class WriterOrchestrator:
         "baseline_005": BaselineWriter005,
     }
 
-    def __init__(self, config_dir: str = "config/writer_configs", data_dir: str = "data/writings", baseline_config_dir: str = "config/baseline_writers", feedback_provider: Optional[FeedbackProvider] = None):
+    def __init__(self, config_dir: str = "config/writer_configs", data_dir: str = "data/writings", baseline_config_dir: str = "config/baseline_writers", feedback_provider_factory=None):
         """
         Initialize the orchestrator.
 
@@ -34,13 +34,31 @@ class WriterOrchestrator:
             config_dir: Directory containing writer configuration files
             data_dir: Directory for storing writer data
             baseline_config_dir: Directory containing baseline writer configuration files
-            feedback_provider: Optional shared feedback provider for all writers (defaults to MockFeedbackProvider)
+            feedback_provider_factory: Callable that returns a new FeedbackProvider instance for each writer.
+                                      Can be a class, function, or lambda. Defaults to MockFeedbackProvider.
         """
         self.config_dir = Path(config_dir)
         self.baseline_config_dir = Path(baseline_config_dir)
         self.data_dir = Path(data_dir)
-        self.feedback_provider = feedback_provider
+        self.feedback_provider_factory = feedback_provider_factory
         self.writers: dict[str, Union[WriterAgent, BaselineWriter, BaselineWriter002, BaselineWriter003, BaselineWriter004, BaselineWriter005]] = {}
+
+    def _create_feedback_provider_for_writer(self) -> FeedbackProvider:
+        """
+        Create a new feedback provider instance for a writer.
+
+        Each writer gets its own feedback provider instance to avoid memory conflicts
+        (e.g., ReaderMarket reader agents would otherwise confuse stories from different writers).
+
+        Returns:
+            A new feedback provider instance
+        """
+        if self.feedback_provider_factory is None:
+            from feedback_providers import MockFeedbackProvider
+            return MockFeedbackProvider()
+
+        # Call the factory to create a new instance
+        return self.feedback_provider_factory()
 
     def load_writer(self, config_filename: str, api_key: Optional[str] = None, is_baseline: bool = False) -> Union[WriterAgent, BaselineWriter]:
         """
@@ -54,6 +72,10 @@ class WriterOrchestrator:
         Returns:
             WriterAgent or BaselineWriter instance
         """
+        # Create a separate feedback provider instance for each writer to avoid memory conflicts
+        # This ensures reader agents don't confuse stories from different writers
+        writer_feedback_provider = self._create_feedback_provider_for_writer()
+
         if is_baseline:
             config_path = self.baseline_config_dir / config_filename
 
@@ -61,10 +83,10 @@ class WriterOrchestrator:
             writer_id = config_filename.replace('.yaml', '')
             writer_class = self.BASELINE_WRITER_CLASSES.get(writer_id, BaselineWriter)
 
-            writer = writer_class.from_yaml(str(config_path), data_dir=str(self.data_dir), feedback_provider=self.feedback_provider)
+            writer = writer_class.from_yaml(str(config_path), data_dir=str(self.data_dir), feedback_provider=writer_feedback_provider)
         else:
             config_path = self.config_dir / config_filename
-            writer = WriterAgent.from_yaml(str(config_path), api_key=api_key, data_dir=str(self.data_dir), feedback_provider=self.feedback_provider)
+            writer = WriterAgent.from_yaml(str(config_path), api_key=api_key, data_dir=str(self.data_dir), feedback_provider=writer_feedback_provider)
 
         writer_id = writer.writer_id if is_baseline else writer.config.writer_id
         self.writers[writer_id] = writer

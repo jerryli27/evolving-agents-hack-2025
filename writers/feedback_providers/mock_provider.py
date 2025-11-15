@@ -19,6 +19,7 @@ class MockFeedbackProvider(FeedbackProvider):
         Args:
             seed: Random seed for reproducibility (optional)
         """
+        self.seed = seed
         if seed is not None:
             random.seed(seed)
 

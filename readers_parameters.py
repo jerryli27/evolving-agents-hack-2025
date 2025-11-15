@@ -2,7 +2,7 @@ agent_bank_path = "genagents/agent_bank/populations/gss_agents/"
 
 
 # Parameters
-num_readers = 10
+num_readers = 1
 novelty_weight = 0.4
 relevance_weight = 0.3
 quality_weight = 1.0 - novelty_weight - relevance_weight

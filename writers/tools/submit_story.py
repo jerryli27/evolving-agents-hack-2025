@@ -31,6 +31,7 @@ class SubmitStoryTool:
         round: int,
         short_summary: str = "",
         price: float = 1.0,
+        max_words: int = 350,
     ) -> str:
         """
         Submit a story and receive feedback.
@@ -43,10 +44,26 @@ class SubmitStoryTool:
             round: Current round number
             short_summary: Short summary of the story
             price: Price to charge for the story
+            max_words: Maximum allowed word count (default: 350)
 
         Returns:
-            Formatted feedback string
+            Formatted feedback string or error message if word limit exceeded
         """
+        # Check word count
+        word_count = len(full_story.split())
+        if word_count > max_words:
+            return (
+                f"ERROR: Story submission REJECTED!\n"
+                f"\n"
+                f"Reason: Story exceeds word limit\n"
+                f"  Your story: {word_count} words\n"
+                f"  Maximum allowed: {max_words} words\n"
+                f"  Excess: {word_count - max_words} words\n"
+                f"\n"
+                f"Please revise your story to be within {max_words} words and resubmit.\n"
+                f"Tip: Focus on the most essential elements of your narrative."
+            )
+
         # Create submission
         submission = StorySubmission(
             writer_name=writer_name,
@@ -120,7 +137,8 @@ class SubmitStoryTool:
         return {
             "name": "submit_story",
             "description": (
-                "Submit your completed story for the current round. You will receive feedback "
+                "Submit your completed story for the current round. IMPORTANT: Stories must be 350 words or fewer. "
+                "Submissions exceeding this limit will be REJECTED. You will receive feedback "
                 "including sales percentage, quality scores (novelty, relevance, quality), and "
                 "qualitative feedback from readers. Use this when you have finished writing your story."
             ),
@@ -133,7 +151,7 @@ class SubmitStoryTool:
                     },
                     "full_story": {
                         "type": "string",
-                        "description": "The complete story text"
+                        "description": "The complete story text (must be 350 words or fewer)"
                     },
                     "short_summary": {
                         "type": "string",
