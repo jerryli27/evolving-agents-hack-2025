@@ -6,6 +6,7 @@ import WriterDetailPanel from '@/components/WriterDetailPanel';
 import FinalistsSection from '@/components/FinalistsSection';
 import ExportVideoModal from '@/components/ExportVideoModal';
 import ScriptViewModal from '@/components/ScriptViewModal';
+import StoryViewerModal from '@/components/StoryViewerModal';
 import { transformToChartData } from '@/lib/mockData';
 import { fetchWriters, fetchRounds, fetchFinalists } from '@/lib/api';
 import { Writer, Story, Finalist, MetricType, RoundData } from '@/types';
@@ -16,6 +17,7 @@ export default function Home() {
   const [selectedWriter, setSelectedWriter] = useState<Writer | null>(null);
   const [exportingFinalist, setExportingFinalist] = useState<Finalist | null>(null);
   const [viewingScript, setViewingScript] = useState<Finalist | null>(null);
+  const [viewingRound, setViewingRound] = useState<RoundData | null>(null);
 
   // API data state
   const [writers, setWriters] = useState<Writer[]>([]);
@@ -187,6 +189,52 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Round Stories */}
+        <div className="border-2 border-black bg-white mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <div className="border-b-2 border-black bg-black px-4 py-2.5">
+            <div className="text-xs md:text-sm font-bold uppercase tracking-wider text-white">📖 ROUND STORIES & READER FEEDBACK</div>
+          </div>
+          <div className="p-4 md:p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {rounds.map((round) => {
+                const avgScore = round.stories.reduce((sum, s) => sum + s.total_score, 0) / round.stories.length;
+                return (
+                  <button
+                    key={round.round_number}
+                    onClick={() => setViewingRound(round)}
+                    className="border-2 border-black bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all p-4 text-left"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="text-sm font-bold uppercase tracking-wide">
+                        Round {round.round_number}
+                      </div>
+                      <div className="text-2xl">🤖</div>
+                    </div>
+                    <div className="space-y-2 text-xs font-mono">
+                      <div>
+                        <span className="opacity-60">Stories:</span>{' '}
+                        <span className="font-bold">{round.stories.length}</span>
+                      </div>
+                      <div>
+                        <span className="opacity-60">Avg Score:</span>{' '}
+                        <span className="font-bold">{(avgScore * 100).toFixed(1)}</span>
+                      </div>
+                      <div className="pt-2 border-t border-gray-200">
+                        <div className="px-3 py-1 bg-black text-white text-center font-bold">
+                          VIEW STORIES →
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-4 text-xs font-mono text-center opacity-60">
+              Click any round to see stories, writer agents, and reader feedback
+            </div>
+          </div>
+        </div>
+
         {/* Writers Legend */}
         <div className="border-2 border-black bg-white mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <div className="border-b-2 border-black bg-black px-4 py-2.5">
@@ -280,6 +328,13 @@ export default function Home() {
         <ScriptViewModal
           finalist={viewingScript}
           onClose={() => setViewingScript(null)}
+        />
+      )}
+
+      {viewingRound && (
+        <StoryViewerModal
+          round={viewingRound}
+          onClose={() => setViewingRound(null)}
         />
       )}
     </div>
