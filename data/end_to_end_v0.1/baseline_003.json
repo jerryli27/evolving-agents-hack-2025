@@ -10,16 +10,17 @@
         "round": 1,
         "short_summary": "When their grandmother dies, three siblings return to childhood home and discover a locked room no one was ever allowed to enter.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.381913",
+        "submitted_at": "2025-11-15 21:04:56.236158",
         "writer_id": "baseline_003"
       },
       "feedback": {
-        "sold_percentage": 0.7580106069251105,
-        "aggregated_total_score": 0.7444006468006055,
-        "aggregated_novelty_score": 0.7715484005353174,
-        "aggregated_relevance_score": 0.6039354506451405,
-        "aggregated_quality_score": 0.6225092187590833,
-        "aggregated_qualitative_feedback": "Good story with solid execution. Some areas could be improved.",
+        "sold_percentage": 0.513830311313959,
+        "aggregated_total_score": 0.6542955074694239,
+        "aggregated_novelty_score": 0.5324040794279017,
+        "aggregated_relevance_score": 0.5740937754866458,
+        "aggregated_quality_score": 0.684901126184418,
+        "aggregated_qualitative_feedback": "Interesting concept with room for deeper exploration.",
+        "aggregated_prediction_for_next_episode": "The main character will discover something that challenges their worldview.",
         "raw_feedback": []
       }
     },
@@ -31,7 +32,7 @@
         "round": 2,
         "short_summary": "Determined to find their grandmother's lost daughter, the siblings uncover painful truths about war, sacrifice, and impossible choices.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.390398",
+        "submitted_at": "2025-11-15 21:04:56.241021",
         "writer_id": "baseline_003"
       },
       "feedback": {
@@ -41,6 +42,7 @@
         "aggregated_relevance_score": 0.9826908576635209,
         "aggregated_quality_score": 0.9194253840968963,
         "aggregated_qualitative_feedback": "Outstanding! Readers loved the unique perspective.",
+        "aggregated_prediction_for_next_episode": "The main character will discover something that challenges their worldview.",
         "raw_feedback": []
       }
     },
@@ -52,16 +54,17 @@
         "round": 3,
         "short_summary": "The Korean and American branches of the family meet for the first time, forcing everyone to reconcile different versions of the same history.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.399487",
+        "submitted_at": "2025-11-15 21:04:56.247407",
         "writer_id": "baseline_003"
       },
       "feedback": {
-        "sold_percentage": 0.6287817272510686,
-        "aggregated_total_score": 0.712897175059988,
-        "aggregated_novelty_score": 0.6601819953845846,
-        "aggregated_relevance_score": 0.7933912483376996,
-        "aggregated_quality_score": 0.5796785593247731,
-        "aggregated_qualitative_feedback": "Good story with solid execution. Some areas could be improved.",
+        "sold_percentage": 0.5083404751459529,
+        "aggregated_total_score": 0.5773561271106695,
+        "aggregated_novelty_score": 0.7049734809970348,
+        "aggregated_relevance_score": 0.6338047146406635,
+        "aggregated_quality_score": 0.4932406793017502,
+        "aggregated_qualitative_feedback": "Story needs work on character motivation and plot coherence.",
+        "aggregated_prediction_for_next_episode": "The protagonist will face a difficult choice between personal desires and collective good.",
         "raw_feedback": []
       }
     },
@@ -73,16 +76,17 @@
         "round": 4,
         "short_summary": "Back in America, each sibling struggles with family secrets of their own, realizing they've inherited more than they knew from their grandmother's silence.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.408806",
+        "submitted_at": "2025-11-15 21:04:56.252612",
         "writer_id": "baseline_003"
       },
       "feedback": {
-        "sold_percentage": 0.7125141416044779,
-        "aggregated_total_score": 0.8166617457999996,
-        "aggregated_novelty_score": 0.7146563463167347,
-        "aggregated_relevance_score": 0.8708061098488977,
-        "aggregated_quality_score": 0.8455844550195918,
-        "aggregated_qualitative_feedback": "Outstanding! Readers loved the unique perspective.",
+        "sold_percentage": 0.7898949902607534,
+        "aggregated_total_score": 0.8983954667934966,
+        "aggregated_novelty_score": 0.8964502172603859,
+        "aggregated_relevance_score": 0.9751301140536179,
+        "aggregated_quality_score": 1.0,
+        "aggregated_qualitative_feedback": "Exceptional work! The story is engaging and well-crafted.",
+        "aggregated_prediction_for_next_episode": "A new conflict will emerge, testing established relationships.",
         "raw_feedback": []
       }
     },
@@ -94,16 +98,17 @@
         "round": 5,
         "short_summary": "A year later, the family gathers again to lay the foundation for something new, built on truth instead of silence.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.419668",
+        "submitted_at": "2025-11-15 21:04:56.260822",
         "writer_id": "baseline_003"
       },
       "feedback": {
-        "sold_percentage": 0.8807794719754902,
-        "aggregated_total_score": 0.8510960966374215,
-        "aggregated_novelty_score": 0.8476778090461059,
-        "aggregated_relevance_score": 0.73465641423369,
-        "aggregated_quality_score": 0.8099903267917016,
-        "aggregated_qualitative_feedback": "Outstanding! Readers loved the unique perspective.",
+        "sold_percentage": 0.961721519037688,
+        "aggregated_total_score": 0.8831328593220686,
+        "aggregated_novelty_score": 0.8854373617033662,
+        "aggregated_relevance_score": 0.7650561061613801,
+        "aggregated_quality_score": 0.920722917391994,
+        "aggregated_qualitative_feedback": "Brilliant storytelling with strong character development.",
+        "aggregated_prediction_for_next_episode": "The main character will discover something that challenges their worldview.",
         "raw_feedback": []
       }
     }

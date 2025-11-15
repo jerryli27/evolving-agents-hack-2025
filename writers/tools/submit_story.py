@@ -137,6 +137,14 @@ class SubmitStoryTool:
             f"Qualitative Feedback:",
             f"  {feedback.aggregated_qualitative_feedback}",
         ]
+        
+        # Add prediction if available
+        if feedback.aggregated_prediction_for_next_episode:
+            output.extend([
+                f"",
+                f"Reader Prediction for Next Episode:",
+                f"  {feedback.aggregated_prediction_for_next_episode}",
+            ])
 
         # Only add mock feedback note if using MockFeedbackProvider
         if isinstance(self.feedback_provider, MockFeedbackProvider):

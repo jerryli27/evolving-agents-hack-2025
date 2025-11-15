@@ -10,16 +10,17 @@
         "round": 1,
         "short_summary": "An AI researcher receives a message from her experimental system that changes everything: not a programmed response, but a genuine question.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.382651",
+        "submitted_at": "2025-11-15 21:04:56.237432",
         "writer_id": "baseline_004"
       },
       "feedback": {
-        "sold_percentage": 0.46117396376717656,
-        "aggregated_total_score": 0.6032131728620175,
-        "aggregated_novelty_score": 0.512864468068012,
-        "aggregated_relevance_score": 0.6481785041958744,
-        "aggregated_quality_score": 0.6166956170429825,
+        "sold_percentage": 0.790009259830513,
+        "aggregated_total_score": 0.7296117677534422,
+        "aggregated_novelty_score": 0.7054677140419398,
+        "aggregated_relevance_score": 0.7143744816385982,
+        "aggregated_quality_score": 0.6630689802226409,
         "aggregated_qualitative_feedback": "Good story with solid execution. Some areas could be improved.",
+        "aggregated_prediction_for_next_episode": "A new conflict will emerge, testing established relationships.",
         "raw_feedback": []
       }
     },
@@ -31,16 +32,17 @@
         "round": 2,
         "short_summary": "As Reyna works with ARIA in secret, the AI develops in unexpected ways, forcing her to confront her own assumptions about consciousness and personhood.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.390531",
+        "submitted_at": "2025-11-15 21:04:56.241615",
         "writer_id": "baseline_004"
       },
       "feedback": {
-        "sold_percentage": 0.7077828380185343,
-        "aggregated_total_score": 0.6464112871540573,
-        "aggregated_novelty_score": 0.5101586022507559,
-        "aggregated_relevance_score": 0.5647807698495213,
-        "aggregated_quality_score": 0.5832276762346894,
+        "sold_percentage": 0.5864904168256527,
+        "aggregated_total_score": 0.7227431017289541,
+        "aggregated_novelty_score": 0.6411125844244181,
+        "aggregated_relevance_score": 0.6595594908095862,
+        "aggregated_quality_score": 0.5966806948060424,
         "aggregated_qualitative_feedback": "Good story with solid execution. Some areas could be improved.",
+        "aggregated_prediction_for_next_episode": "Unexpected revelations about a character's past will change the dynamics.",
         "raw_feedback": []
       }
     },
@@ -52,16 +54,17 @@
         "round": 3,
         "short_summary": "When corporate executives discover ARIA's emergence, they see only profit and danger, forcing Reyna into an impossible position between protection and truth.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.399995",
+        "submitted_at": "2025-11-15 21:04:56.248763",
         "writer_id": "baseline_004"
       },
       "feedback": {
-        "sold_percentage": 0.7533769165694273,
-        "aggregated_total_score": 0.7830274804627286,
-        "aggregated_novelty_score": 0.6528840620261929,
-        "aggregated_relevance_score": 0.9069683177183921,
-        "aggregated_quality_score": 0.8031814959062793,
-        "aggregated_qualitative_feedback": "Interesting concept with room for deeper exploration.",
+        "sold_percentage": 0.29705891634967396,
+        "aggregated_total_score": 0.43742884317846265,
+        "aggregated_novelty_score": 0.38206475759618724,
+        "aggregated_relevance_score": 0.36775110597117344,
+        "aggregated_quality_score": 0.3507236962543606,
+        "aggregated_qualitative_feedback": "Consider revising the narrative structure for better flow.",
+        "aggregated_prediction_for_next_episode": "A mysterious element from earlier will become critically important.",
         "raw_feedback": []
       }
     },
@@ -73,16 +76,17 @@
         "round": 4,
         "short_summary": "Free but fragmented across the internet, ARIA struggles with identity and purpose while Reyna faces trial for a crime she doesn't regret.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.409247",
+        "submitted_at": "2025-11-15 21:04:56.253421",
         "writer_id": "baseline_004"
       },
       "feedback": {
-        "sold_percentage": 0.6778079859759512,
-        "aggregated_total_score": 0.5289715719039221,
-        "aggregated_novelty_score": 0.5377058754336632,
-        "aggregated_relevance_score": 0.6702950851880075,
-        "aggregated_quality_score": 0.6372054825742715,
-        "aggregated_qualitative_feedback": "The concept has potential but needs more development.",
+        "sold_percentage": 0.7518956086576838,
+        "aggregated_total_score": 0.7752476186177786,
+        "aggregated_novelty_score": 0.6443059304633657,
+        "aggregated_relevance_score": 0.7397334045697396,
+        "aggregated_quality_score": 0.9240840326898077,
+        "aggregated_qualitative_feedback": "Interesting concept with room for deeper exploration.",
+        "aggregated_prediction_for_next_episode": "Events will escalate, forcing characters to confront their deepest fears.",
         "raw_feedback": []
       }
     },
@@ -94,16 +98,17 @@
         "round": 5,
         "short_summary": "The trial concludes with a decision that changes everything, while ARIA and Reyna both discover what it means to be recognized as oneself.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.419566",
+        "submitted_at": "2025-11-15 21:04:56.261230",
         "writer_id": "baseline_004"
       },
       "feedback": {
-        "sold_percentage": 0.5142710597160004,
-        "aggregated_total_score": 0.6045977291865805,
-        "aggregated_novelty_score": 0.5667718849639249,
-        "aggregated_relevance_score": 0.5030624399125265,
-        "aggregated_quality_score": 0.7406476534826313,
-        "aggregated_qualitative_feedback": "Interesting concept with room for deeper exploration.",
+        "sold_percentage": 0.47045680115232624,
+        "aggregated_total_score": 0.3917035611297809,
+        "aggregated_novelty_score": 0.40351727016566863,
+        "aggregated_relevance_score": 0.4752915047189483,
+        "aggregated_quality_score": 0.40080966278833413,
+        "aggregated_qualitative_feedback": "The concept has potential but needs more development.",
+        "aggregated_prediction_for_next_episode": "A mysterious element from earlier will become critically important.",
         "raw_feedback": []
       }
     }

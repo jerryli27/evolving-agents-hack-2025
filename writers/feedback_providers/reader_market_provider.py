@@ -98,8 +98,12 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         for feedback in aggregated_feedback.get('raw_feedback', []):
             reader_feedback = ReaderFeedback(
                 reader_id=f"{feedback['reader_agent'].scratch.get('first_name', '')} {feedback['reader_agent'].scratch.get('last_name', '')}",
-                rating=feedback['total_score'],
-                comment=feedback['qualitative_feedback']
+                total_score=feedback['total_score'],
+                novelty=feedback['novelty'],
+                relevance=feedback['relevance'],
+                quality=feedback['quality'],
+                qualitative_feedback=feedback['qualitative_feedback'],
+                prediction_for_next_episode=feedback.get('prediction_for_next_episode', '')
             )
             raw_feedback.append(reader_feedback)
 
@@ -111,6 +115,7 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
             aggregated_relevance_score=aggregated_feedback['aggregated_relevance_score'],
             aggregated_quality_score=aggregated_feedback['aggregated_quality_score'],
             aggregated_qualitative_feedback=self._format_qualitative_feedback(aggregated_feedback['raw_feedback']),
+            aggregated_prediction_for_next_episode=aggregated_feedback.get('aggregated_prediction_for_next_episode', ''),
             raw_feedback=raw_feedback
         )
 

@@ -10,16 +10,17 @@
         "round": 1,
         "short_summary": "A woman confined to rest in an old mansion bedroom becomes obsessed with the wallpaper's mysterious pattern, spiraling into psychological turmoil.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.383060",
+        "submitted_at": "2025-11-15 21:04:56.238187",
         "writer_id": "baseline_001"
       },
       "feedback": {
-        "sold_percentage": 0.5029826402395109,
-        "aggregated_total_score": 0.5695254277703121,
-        "aggregated_novelty_score": 0.6803155240081923,
-        "aggregated_relevance_score": 0.6471676379092423,
-        "aggregated_quality_score": 0.46742322268337916,
-        "aggregated_qualitative_feedback": "Story needs work on character motivation and plot coherence.",
+        "sold_percentage": 0.6709587919483336,
+        "aggregated_total_score": 0.7188836369929361,
+        "aggregated_novelty_score": 0.6155274869364706,
+        "aggregated_relevance_score": 0.8560475586549705,
+        "aggregated_quality_score": 0.6698620005267242,
+        "aggregated_qualitative_feedback": "Good story with solid execution. Some areas could be improved.",
+        "aggregated_prediction_for_next_episode": "Tensions will rise as hidden motivations come to light.",
         "raw_feedback": []
       }
     },
@@ -31,16 +32,17 @@
         "round": 2,
         "short_summary": "A utopian city's prosperity depends on the suffering of one child. A young teacher discovers this truth and must decide whether to stay or walk away.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.391053",
+        "submitted_at": "2025-11-15 21:04:56.241797",
         "writer_id": "baseline_001"
       },
       "feedback": {
-        "sold_percentage": 0.9231357326356692,
-        "aggregated_total_score": 0.8131906326090883,
-        "aggregated_novelty_score": 0.7772285001208381,
-        "aggregated_relevance_score": 0.7992137233196189,
-        "aggregated_quality_score": 0.9134237606013134,
-        "aggregated_qualitative_feedback": "Exceptional work! The story is engaging and well-crafted.",
+        "sold_percentage": 0.5140988257340303,
+        "aggregated_total_score": 0.5280757350234997,
+        "aggregated_novelty_score": 0.6283088630157248,
+        "aggregated_relevance_score": 0.42687196417032514,
+        "aggregated_quality_score": 0.48465694509175616,
+        "aggregated_qualitative_feedback": "Consider revising the narrative structure for better flow.",
+        "aggregated_prediction_for_next_episode": "Events will escalate, forcing characters to confront their deepest fears.",
         "raw_feedback": []
       }
     },
@@ -52,16 +54,17 @@
         "round": 3,
         "short_summary": "A small town's annual tradition seems quaint until a newcomer discovers what really happens to the lottery winner.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.400370",
+        "submitted_at": "2025-11-15 21:04:56.249087",
         "writer_id": "baseline_001"
       },
       "feedback": {
-        "sold_percentage": 0.5354383280675508,
-        "aggregated_total_score": 0.4888067284790868,
-        "aggregated_novelty_score": 0.45749629879728604,
-        "aggregated_relevance_score": 0.6131710054012498,
-        "aggregated_quality_score": 0.47646228425530646,
-        "aggregated_qualitative_feedback": "Story needs work on character motivation and plot coherence.",
+        "sold_percentage": 0.4273453042801676,
+        "aggregated_total_score": 0.4275759264324844,
+        "aggregated_novelty_score": 0.5429808725984951,
+        "aggregated_relevance_score": 0.47043148749261166,
+        "aggregated_quality_score": 0.3204374035651032,
+        "aggregated_qualitative_feedback": "The concept has potential but needs more development.",
+        "aggregated_prediction_for_next_episode": "The main character will discover something that challenges their worldview.",
         "raw_feedback": []
       }
     },
@@ -73,16 +76,17 @@
         "round": 4,
         "short_summary": "A devoted salesman wakes to find himself inexplicably transformed, forcing his family to confront who they really are.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.409756",
+        "submitted_at": "2025-11-15 21:04:56.253737",
         "writer_id": "baseline_001"
       },
       "feedback": {
-        "sold_percentage": 0.592535569049017,
-        "aggregated_total_score": 0.7081700461539111,
-        "aggregated_novelty_score": 0.8236065811926438,
-        "aggregated_relevance_score": 0.783433386031394,
-        "aggregated_quality_score": 0.7887496659511448,
-        "aggregated_qualitative_feedback": "Engaging narrative, though pacing could be tightened.",
+        "sold_percentage": 0.9908809372385203,
+        "aggregated_total_score": 0.882647026568171,
+        "aggregated_novelty_score": 0.7360913331510168,
+        "aggregated_relevance_score": 0.9488635723762293,
+        "aggregated_quality_score": 0.9371601372761433,
+        "aggregated_qualitative_feedback": "Brilliant storytelling with strong character development.",
+        "aggregated_prediction_for_next_episode": "Events will escalate, forcing characters to confront their deepest fears.",
         "raw_feedback": []
       }
     },
@@ -94,16 +98,17 @@
         "round": 5,
         "short_summary": "A caretaker's meticulous plan to commit the perfect crime unravels as guilt manifests through an impossible sound.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.419960",
+        "submitted_at": "2025-11-15 21:04:56.261533",
         "writer_id": "baseline_001"
       },
       "feedback": {
-        "sold_percentage": 0.36593286393700525,
-        "aggregated_total_score": 0.4436713862028353,
-        "aggregated_novelty_score": 0.46387846930950827,
-        "aggregated_relevance_score": 0.3172985006902451,
-        "aggregated_quality_score": 0.5132436646562236,
+        "sold_percentage": 0.47672374241363724,
+        "aggregated_total_score": 0.5931634248173687,
+        "aggregated_novelty_score": 0.5520576549716488,
+        "aggregated_relevance_score": 0.7387598385005124,
+        "aggregated_quality_score": 0.6851958662565073,
         "aggregated_qualitative_feedback": "The concept has potential but needs more development.",
+        "aggregated_prediction_for_next_episode": "The protagonist will face a difficult choice between personal desires and collective good.",
         "raw_feedback": []
       }
     }

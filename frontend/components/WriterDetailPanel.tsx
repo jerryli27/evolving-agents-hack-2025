@@ -1,7 +1,7 @@
 'use client';
 
+import { Story, Writer } from '@/types';
 import { useState } from 'react';
-import { Writer, Story } from '@/types';
 
 interface WriterDetailPanelProps {
   writer: Writer;

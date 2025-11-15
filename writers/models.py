@@ -59,19 +59,39 @@ class StorySubmission(BaseModel):
 
 
 class ReaderFeedback(BaseModel):
-    """Individual reader feedback (TBD - placeholder structure)."""
+    """Individual reader feedback matching ReaderMarket structure."""
     reader_id: str = ""
-    rating: float = 0.0
-    comment: str = ""
-    # More fields TBD
+    total_score: float = 0.0  # Combined score (quality * weight + novelty * weight + relevance * weight)
+    novelty: float = 0.0
+    relevance: float = 0.0
+    quality: float = 0.0
+    qualitative_feedback: str = ""
+    prediction_for_next_episode: str = ""
+    
+    # Legacy fields for backward compatibility
+    @property
+    def rating(self) -> float:
+        """Alias for total_score for backward compatibility."""
+        return self.total_score
+    
+    @property
+    def comment(self) -> str:
+        """Alias for qualitative_feedback for backward compatibility."""
+        return self.qualitative_feedback
     
     def format_feedback(self) -> str:
         """Format this reader's feedback for display."""
-        return (
+        result = (
             f"    Reader {self.reader_id}:\n"
-            f"      Rating: {self.rating:.2f}\n"
-            f"      Comment: {self.comment}"
+            f"      Total Score: {self.total_score:.2f}\n"
+            f"      Novelty: {self.novelty:.2f}\n"
+            f"      Relevance: {self.relevance:.2f}\n"
+            f"      Quality: {self.quality:.2f}\n"
+            f"      Feedback: {self.qualitative_feedback}"
         )
+        if self.prediction_for_next_episode:
+            result += f"\n      Prediction for Next Episode: {self.prediction_for_next_episode}"
+        return result
 
 
 class FeedbackResponse(BaseModel):
@@ -82,6 +102,7 @@ class FeedbackResponse(BaseModel):
     aggregated_relevance_score: float = Field(ge=0.0, le=1.0)  # 0.0 - 1.0
     aggregated_quality_score: float = Field(ge=0.0, le=1.0)  # 0.0 - 1.0
     aggregated_qualitative_feedback: str
+    aggregated_prediction_for_next_episode: str = ""
     raw_feedback: list[ReaderFeedback] = Field(default_factory=list)
 
 
@@ -106,6 +127,9 @@ class PastWriting(BaseModel):
             f"  Quality: {fb.aggregated_quality_score:.2f}\n"
             f"  Feedback: {fb.aggregated_qualitative_feedback}"
         )
+        
+        if fb.aggregated_prediction_for_next_episode:
+            summary += f"\n  Prediction for Next Episode: {fb.aggregated_prediction_for_next_episode}"
         
         # Add raw feedback if available
         if fb.raw_feedback:
