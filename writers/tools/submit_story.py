@@ -4,19 +4,23 @@ import random
 from typing import Optional
 from models import StorySubmission, FeedbackResponse, WriterHistory, PastWriting
 from tools.past_writings import PastWritingsTool
+from feedback_providers import FeedbackProvider, MockFeedbackProvider
 
 
 class SubmitStoryTool:
     """Tool for writers to submit their stories and receive feedback."""
 
-    def __init__(self, data_dir: str = "data/writings"):
+    def __init__(self, data_dir: str = "data/writings", feedback_provider: Optional[FeedbackProvider] = None):
         """
         Initialize the tool.
 
         Args:
             data_dir: Directory where writer histories are stored
+            feedback_provider: Feedback provider instance (defaults to MockFeedbackProvider)
         """
         self.past_writings_tool = PastWritingsTool(data_dir)
+        self.feedback_provider = feedback_provider if feedback_provider is not None else MockFeedbackProvider()
+        self._current_timestep = 0  # Track timestep for memory-enabled providers
 
     def submit_story(
         self,
@@ -54,8 +58,17 @@ class SubmitStoryTool:
             writer_id=writer_id,
         )
 
-        # Generate mock feedback (placeholder until real feedback system is implemented)
-        feedback = self._generate_mock_feedback()
+        # Get feedback from the configured provider
+        self._current_timestep += 1
+        feedback = self.feedback_provider.get_feedback(
+            title=title,
+            full_story=full_story,
+            short_summary=short_summary,
+            price=price,
+            timestep=self._current_timestep,
+            writer_id=writer_id,
+            round_num=round
+        )
 
         # Load or create writer history
         history = self.past_writings_tool._load_history(writer_id)
@@ -70,49 +83,6 @@ class SubmitStoryTool:
 
         # Format feedback response
         return self._format_feedback(submission, feedback)
-
-    def _generate_mock_feedback(self) -> FeedbackResponse:
-        """
-        Generate mock feedback with random scores.
-
-        TODO: Replace this with actual feedback system when implemented.
-        """
-        # Generate random but somewhat correlated scores
-        base_quality = random.uniform(0.3, 0.9)
-        noise = 0.15
-
-        return FeedbackResponse(
-            sold_percentage=max(0.0, min(1.0, base_quality + random.uniform(-noise, noise))),
-            aggregated_total_score=base_quality,
-            aggregated_novelty_score=max(0.0, min(1.0, base_quality + random.uniform(-noise, noise))),
-            aggregated_relevance_score=max(0.0, min(1.0, base_quality + random.uniform(-noise, noise))),
-            aggregated_quality_score=max(0.0, min(1.0, base_quality + random.uniform(-noise, noise))),
-            aggregated_qualitative_feedback=self._generate_mock_qualitative_feedback(base_quality),
-            raw_feedback=[]  # Empty for now
-        )
-
-    def _generate_mock_qualitative_feedback(self, score: float) -> str:
-        """Generate mock qualitative feedback based on score."""
-        if score > 0.8:
-            templates = [
-                "Exceptional work! The story is engaging and well-crafted.",
-                "Outstanding! Readers loved the unique perspective.",
-                "Brilliant storytelling with strong character development.",
-            ]
-        elif score > 0.6:
-            templates = [
-                "Good story with solid execution. Some areas could be improved.",
-                "Engaging narrative, though pacing could be tightened.",
-                "Interesting concept with room for deeper exploration.",
-            ]
-        else:
-            templates = [
-                "The concept has potential but needs more development.",
-                "Story needs work on character motivation and plot coherence.",
-                "Consider revising the narrative structure for better flow.",
-            ]
-
-        return random.choice(templates)
 
     def _format_feedback(self, submission: StorySubmission, feedback: FeedbackResponse) -> str:
         """Format feedback into a readable string."""
@@ -135,9 +105,12 @@ class SubmitStoryTool:
             f"",
             f"Qualitative Feedback:",
             f"  {feedback.aggregated_qualitative_feedback}",
-            f"",
-            f"Note: This is mock feedback. Real reader feedback will be available soon.",
         ]
+
+        # Only add mock feedback note if using MockFeedbackProvider
+        if isinstance(self.feedback_provider, MockFeedbackProvider):
+            output.append(f"")
+            output.append(f"Note: This is mock feedback. Real reader feedback will be available soon.")
 
         return "\n".join(output)
 

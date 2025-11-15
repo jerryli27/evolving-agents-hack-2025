@@ -40,6 +40,9 @@ class WriterConfig(BaseModel):
     enable_feedback_tool: bool = True
     # Optional: control which past writings the writer can see
     can_see_other_writers: bool = False
+    # Story series configuration
+    target_num_rounds: int = 5  # Number of rounds/stories the writer should plan for
+    should_write_sequel: bool = True  # Whether to write stories as a connected series
 
 
 class StorySubmission(BaseModel):
@@ -104,8 +107,27 @@ class WriterHistory(BaseModel):
     writings: list[PastWriting] = Field(default_factory=list)
 
     def add_writing(self, submission: StorySubmission, feedback: Optional[FeedbackResponse] = None):
-        """Add a new writing to history."""
-        self.writings.append(PastWriting(submission=submission, feedback=feedback))
+        """
+        Add a new writing to history.
+
+        If a writing for this round already exists, it will be replaced.
+        This prevents duplicate entries when running multiple simulations.
+        """
+        # Check if this round already exists
+        existing_index = None
+        for i, writing in enumerate(self.writings):
+            if writing.submission.round == submission.round:
+                existing_index = i
+                break
+
+        new_writing = PastWriting(submission=submission, feedback=feedback)
+
+        if existing_index is not None:
+            # Replace existing writing for this round
+            self.writings[existing_index] = new_writing
+        else:
+            # Add new writing
+            self.writings.append(new_writing)
 
     def get_round_writing(self, round_num: int) -> Optional[PastWriting]:
         """Get writing for a specific round."""

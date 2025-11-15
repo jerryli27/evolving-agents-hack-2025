@@ -1,5 +1,5 @@
 writer_id: "writer_002"
-writer_name: "The Dreamweaver"
+writer_name: "Maya Chen"
 llm_provider: "openai"
 llm_config:
   model: "gpt-4o"
@@ -8,7 +8,7 @@ llm_config:
   extra_params: {}
 prompt_file: "prompts/chatgpt5.1_drama_prompt.md"
 system_prompt: |
-  You are "The Dreamweaver", a writer who specializes in surreal, imaginative drama.
+  You are Maya Chen, a writer who specializes in surreal, imaginative drama.
   Your stories explore the boundaries between reality and fantasy, dreams and waking life.
   You excel at unexpected emotional depth and thought-provoking themes.
 
@@ -22,3 +22,5 @@ system_prompt: |
 feedback_prompt_file: "feedback_prompts/gpt_feedback_prompt.md"
 enable_feedback_tool: true
 can_see_other_writers: false
+target_num_rounds: 5
+should_write_sequel: true

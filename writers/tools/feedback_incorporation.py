@@ -27,11 +27,19 @@ class FeedbackIncorporationTool:
             return
 
         framework_path = Path(self.feedback_prompt_file)
+
+        # Try multiple locations for the feedback prompt file
+        if not framework_path.exists():
+            # Try prepending 'writers/' for when running from root directory
+            alt_path = Path('writers') / self.feedback_prompt_file
+            if alt_path.exists():
+                framework_path = alt_path
+
         if framework_path.exists():
             with open(framework_path, 'r', encoding='utf-8') as f:
                 self._framework_content = f.read()
         else:
-            print(f"Warning: feedback_prompt_file '{self.feedback_prompt_file}' not found.")
+            # Silently skip missing feedback prompt files
             self._framework_content = None
 
     def get_feedback_framework(self) -> str:
