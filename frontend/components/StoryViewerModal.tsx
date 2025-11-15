@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { RoundData } from '@/types';
+import { RoundData, Writer } from '@/types';
 
 interface StoryViewerModalProps {
   round: RoundData;
@@ -9,9 +9,9 @@ interface StoryViewerModalProps {
 }
 
 export default function StoryViewerModal({ round, onClose }: StoryViewerModalProps) {
-  const [selectedWriter, setSelectedWriter] = useState(0);
+  const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
 
-  const story = round.stories[selectedWriter];
+  const story = round.stories[selectedStoryIndex];
 
   // Split story into paragraphs for easier reading
   const paragraphs = story.full_script.split('\n\n').filter(p => p.trim());
@@ -24,7 +24,7 @@ export default function StoryViewerModal({ round, onClose }: StoryViewerModalPro
           <div className="flex justify-between items-start">
             <div>
               <h2 className="text-2xl font-bold uppercase tracking-wider text-white mb-1">
-                Round {round.round_number} Stories
+                Round {round.round} Stories
               </h2>
               <p className="text-sm text-white opacity-70 font-mono">
                 {round.stories.length} writers competing • AI-generated feedback
@@ -41,32 +41,32 @@ export default function StoryViewerModal({ round, onClose }: StoryViewerModalPro
 
         {/* Content */}
         <div className="flex-1 overflow-hidden flex">
-          {/* Writer Tabs - Left Sidebar */}
+          {/* Story Tabs - Left Sidebar */}
           <div className="w-64 border-r-4 border-black bg-white overflow-y-auto">
             <div className="p-3">
               <div className="text-xs font-bold uppercase tracking-wide mb-3 opacity-60">
-                Select Writer
+                Select Story
               </div>
               {round.stories.map((s, idx) => (
                 <button
                   key={idx}
-                  onClick={() => setSelectedWriter(idx)}
+                  onClick={() => setSelectedStoryIndex(idx)}
                   className={`w-full text-left p-3 mb-2 border-2 border-black transition-all ${
-                    selectedWriter === idx
+                    selectedStoryIndex === idx
                       ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-y-1'
                       : 'bg-white hover:bg-gray-100'
                   }`}
                 >
-                  <div className="font-bold text-sm truncate">{s.writer_name}</div>
-                  <div className="text-xs opacity-70 mt-1">{s.title}</div>
+                  <div className="font-bold text-sm truncate">{s.title}</div>
+                  <div className="text-xs opacity-70 mt-1 truncate">{s.writer_id}</div>
                   <div className="mt-2 flex items-center gap-2">
                     <div className="text-xs font-mono font-bold">
-                      {(s.total_score * 100).toFixed(0)}pts
+                      {s.score?.composite?.toFixed(0) || 0}pts
                     </div>
                     <div className="flex-1 bg-gray-200 h-1.5 border border-black">
                       <div
                         className="bg-black h-full"
-                        style={{ width: `${s.total_score * 100}%` }}
+                        style={{ width: `${Math.min(100, s.score?.composite || 0)}%` }}
                       />
                     </div>
                   </div>
@@ -83,14 +83,17 @@ export default function StoryViewerModal({ round, onClose }: StoryViewerModalPro
                 <h3 className="text-3xl font-bold mb-2">{story.title}</h3>
                 <div className="flex items-center gap-4 text-sm font-mono">
                   <span className="px-3 py-1 bg-black text-white">
-                    {story.writer_name}
+                    {story.writer_id}
                   </span>
-                  <span className="opacity-60">Round {round.round_number}</span>
-                  <span className="font-bold">Score: {(story.total_score * 100).toFixed(1)}/100</span>
+                  <span className="opacity-60">Round {round.round}</span>
+                  <span className="font-bold">Score: {story.score?.composite?.toFixed(1) || 0}/100</span>
                 </div>
+                {story.logline && (
+                  <p className="mt-3 text-sm italic opacity-70">{story.logline}</p>
+                )}
               </div>
 
-              {/* Story Text with Inline Feedback */}
+              {/* Story Text */}
               <div className="mb-8">
                 <div className="text-sm font-bold uppercase tracking-wide mb-4 opacity-60">
                   Story
@@ -101,14 +104,6 @@ export default function StoryViewerModal({ round, onClose }: StoryViewerModalPro
                       <p className="text-base leading-relaxed text-gray-800 bg-white border-2 border-black p-4">
                         {para}
                       </p>
-                      {/* Show feedback hints on hover */}
-                      {idx === 0 && (
-                        <div className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <div className="bg-yellow-300 border-2 border-black px-2 py-1 text-xs font-bold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                            💭 Opening
-                          </div>
-                        </div>
-                      )}
                     </div>
                   ))}
                 </div>
@@ -127,96 +122,95 @@ export default function StoryViewerModal({ round, onClose }: StoryViewerModalPro
                       Novelty
                     </div>
                     <div className="text-3xl font-bold mb-2">
-                      {(story.novelty_score * 100).toFixed(0)}
+                      {story.score?.novelty?.toFixed(0) || 0}
                     </div>
                     <div className="text-xs">How original and creative</div>
                   </div>
 
-                  {/* Relevance Score */}
+                  {/* Reader Alignment Score */}
                   <div className="bg-blue-100 border-2 border-black p-4">
                     <div className="text-xs font-bold uppercase tracking-wide mb-2 opacity-60">
-                      Relevance
+                      Alignment
                     </div>
                     <div className="text-3xl font-bold mb-2">
-                      {(story.relevance_score * 100).toFixed(0)}
+                      {story.score?.reader_alignment?.toFixed(0) || 0}
                     </div>
-                    <div className="text-xs">Story coherence & focus</div>
+                    <div className="text-xs">Reader preference match</div>
                   </div>
 
-                  {/* Quality Score */}
+                  {/* Coherence Score */}
                   <div className="bg-green-100 border-2 border-black p-4">
                     <div className="text-xs font-bold uppercase tracking-wide mb-2 opacity-60">
-                      Quality
+                      Coherence
                     </div>
                     <div className="text-3xl font-bold mb-2">
-                      {(story.quality_score * 100).toFixed(0)}
+                      {story.score?.coherence?.toFixed(0) || 0}
                     </div>
-                    <div className="text-xs">Writing & execution</div>
+                    <div className="text-xs">Story quality & execution</div>
                   </div>
                 </div>
 
                 {/* Detailed Feedback */}
-                <div className="bg-white border-2 border-black p-6">
-                  <div className="text-sm font-bold uppercase tracking-wide mb-4">
-                    💬 Detailed Reader Analysis
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <div className="text-xs font-bold text-purple-600 mb-1">NOVELTY FEEDBACK</div>
-                      <p className="text-sm leading-relaxed">
-                        {story.novelty_score >= 0.7
-                          ? `Exceptional creativity! The story introduces fresh perspectives and unique narrative choices that stand out from typical genre conventions.`
-                          : story.novelty_score >= 0.5
-                          ? `Good originality with some fresh ideas, though certain elements feel familiar. Consider pushing creative boundaries further.`
-                          : `The narrative follows conventional patterns. Readers would benefit from more unexpected twists and unique character development.`
-                        }
-                      </p>
+                {story.reader_feedback?.summary && (
+                  <div className="bg-white border-2 border-black p-6">
+                    <div className="text-sm font-bold uppercase tracking-wide mb-4">
+                      💬 Detailed Reader Analysis
                     </div>
 
-                    <div>
-                      <div className="text-xs font-bold text-blue-600 mb-1">RELEVANCE FEEDBACK</div>
-                      <p className="text-sm leading-relaxed">
-                        {story.relevance_score >= 0.7
-                          ? `Excellent coherence! Every element serves the narrative. The story maintains strong thematic focus throughout.`
-                          : story.relevance_score >= 0.5
-                          ? `Generally coherent with some tangential elements. Tightening the narrative focus could enhance impact.`
-                          : `Some sections drift from the central narrative. Recommend refocusing on core story elements and removing distractions.`
-                        }
-                      </p>
-                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <div className="text-xs font-bold text-blue-600 mb-1">READER FEEDBACK</div>
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap">
+                          {story.reader_feedback.summary}
+                        </p>
+                      </div>
 
-                    <div>
-                      <div className="text-xs font-bold text-green-600 mb-1">QUALITY FEEDBACK</div>
-                      <p className="text-sm leading-relaxed">
-                        {story.quality_score >= 0.7
-                          ? `Outstanding execution! Strong prose, well-developed characters, and compelling pacing create an engaging reading experience.`
-                          : story.quality_score >= 0.5
-                          ? `Solid writing with room for polish. Character development and pacing are adequate but could be enhanced.`
-                          : `Technical execution needs improvement. Focus on character depth, pacing, and prose quality in revision.`
-                        }
-                      </p>
+                      {story.reader_feedback.tags && story.reader_feedback.tags.length > 0 && (
+                        <div>
+                          <div className="text-xs font-bold text-purple-600 mb-2">STORY TAGS</div>
+                          <div className="flex flex-wrap gap-2">
+                            {story.reader_feedback.tags.map((tag, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-1 bg-gray-100 border border-black text-xs font-mono"
+                              >
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Reader Market Simulation */}
+                {/* Score Breakdown */}
                 <div className="mt-6 bg-yellow-50 border-2 border-black p-4">
                   <div className="flex items-start gap-3">
                     <div className="text-2xl">📊</div>
                     <div className="flex-1">
                       <div className="text-sm font-bold mb-1">
-                        Predicted Market Performance
+                        Composite Score Breakdown
                       </div>
                       <div className="text-xs opacity-70 mb-3">
-                        Based on {round.stories.length} reader agents simulating diverse preferences
+                        Based on {round.stories.length} competing stories in this round
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-lg font-bold font-mono">
-                          {(story.sold_percentage * 100).toFixed(1)}%
+                      <div className="grid grid-cols-4 gap-2 text-xs font-mono">
+                        <div>
+                          <div className="opacity-60">Novelty</div>
+                          <div className="font-bold">{story.score?.novelty?.toFixed(1) || 0}</div>
                         </div>
-                        <div className="text-xs">
-                          of simulated readers would purchase this story
+                        <div>
+                          <div className="opacity-60">Alignment</div>
+                          <div className="font-bold">{story.score?.reader_alignment?.toFixed(1) || 0}</div>
+                        </div>
+                        <div>
+                          <div className="opacity-60">Coherence</div>
+                          <div className="font-bold">{story.score?.coherence?.toFixed(1) || 0}</div>
+                        </div>
+                        <div>
+                          <div className="opacity-60">Composite</div>
+                          <div className="font-bold text-lg">{story.score?.composite?.toFixed(1) || 0}</div>
                         </div>
                       </div>
                     </div>
