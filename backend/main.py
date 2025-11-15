@@ -22,11 +22,7 @@ app = FastAPI(
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://*.vercel.app",
-        os.getenv("FRONTEND_URL", ""),
-    ],
+    allow_origins=["*"],  # Allow all origins for now - can restrict later
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
