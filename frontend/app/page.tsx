@@ -197,16 +197,16 @@ export default function Home() {
           <div className="p-4 md:p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {rounds.map((round) => {
-                const avgScore = round.stories.reduce((sum, s) => sum + s.total_score, 0) / round.stories.length;
+                const avgScore = round.stories.reduce((sum, s) => sum + (s.score?.composite || 0), 0) / round.stories.length;
                 return (
                   <button
-                    key={round.round_number}
+                    key={round.round}
                     onClick={() => setViewingRound(round)}
                     className="border-2 border-black bg-white hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 transition-all p-4 text-left"
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="text-sm font-bold uppercase tracking-wide">
-                        Round {round.round_number}
+                        Round {round.round}
                       </div>
                       <div className="text-2xl">🤖</div>
                     </div>
