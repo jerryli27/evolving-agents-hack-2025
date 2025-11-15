@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import EvolutionChart from '@/components/EvolutionChart';
 import WriterDetailPanel from '@/components/WriterDetailPanel';
 import FinalistsSection from '@/components/FinalistsSection';
 import ExportVideoModal from '@/components/ExportVideoModal';
 import ScriptViewModal from '@/components/ScriptViewModal';
-import { WRITERS, ROUNDS, FINALISTS, transformToChartData } from '@/lib/mockData';
-import { Writer, Story, Finalist, MetricType } from '@/types';
+import { transformToChartData } from '@/lib/mockData';
+import { fetchWriters, fetchRounds, fetchFinalists } from '@/lib/api';
+import { Writer, Story, Finalist, MetricType, RoundData } from '@/types';
 
 export default function Home() {
   const [selectedMetric, setSelectedMetric] = useState<MetricType>('composite');
@@ -16,30 +17,59 @@ export default function Home() {
   const [exportingFinalist, setExportingFinalist] = useState<Finalist | null>(null);
   const [viewingScript, setViewingScript] = useState<Finalist | null>(null);
 
+  // API data state
+  const [writers, setWriters] = useState<Writer[]>([]);
+  const [rounds, setRounds] = useState<RoundData[]>([]);
+  const [finalists, setFinalists] = useState<Finalist[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data from API on mount
+  useEffect(() => {
+    async function loadData() {
+      try {
+        console.log('[PAGE] Starting data fetch...');
+        const [writersData, roundsData, finalistsData] = await Promise.all([
+          fetchWriters(),
+          fetchRounds(),
+          fetchFinalists(3)
+        ]);
+        console.log('[PAGE] Data fetched successfully:', { writersData, roundsData, finalistsData });
+        setWriters(writersData);
+        setRounds(roundsData);
+        setFinalists(finalistsData);
+      } catch (error) {
+        console.error('[PAGE] Error loading data:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
   // Filter writers if showing finalists only
   const displayedWriters = useMemo(() => {
     if (showFinalistsOnly) {
-      const finalistWriterIds = new Set(FINALISTS.map(f => f.writer.writer_id));
-      return WRITERS.filter(w => finalistWriterIds.has(w.writer_id));
+      const finalistWriterIds = new Set(finalists.map(f => f.writer.writer_id));
+      return writers.filter(w => finalistWriterIds.has(w.writer_id));
     }
-    return WRITERS;
-  }, [showFinalistsOnly]);
+    return writers;
+  }, [showFinalistsOnly, writers, finalists]);
 
   // Transform data for chart
   const chartData = useMemo(() => {
-    return transformToChartData(ROUNDS, selectedMetric);
-  }, [selectedMetric]);
+    return transformToChartData(rounds, selectedMetric);
+  }, [rounds, selectedMetric]);
 
   // Get stories for selected writer
   const selectedWriterStories = useMemo(() => {
     if (!selectedWriter) return [];
-    return ROUNDS.flatMap(round =>
+    return rounds.flatMap(round =>
       round.stories.filter(story => story.writer_id === selectedWriter.writer_id)
     );
-  }, [selectedWriter]);
+  }, [selectedWriter, rounds]);
 
   const handlePointClick = (writerId: string, round: number) => {
-    const writer = WRITERS.find(w => w.writer_id === writerId);
+    const writer = writers.find(w => w.writer_id === writerId);
     if (writer) {
       setSelectedWriter(writer);
     }
@@ -52,6 +82,18 @@ export default function Home() {
   const handleViewScript = (finalist: Finalist) => {
     setViewingScript(finalist);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-2xl font-bold uppercase mb-2">Loading Competition Data...</div>
+          <div className="text-sm font-mono opacity-60">Fetching writers, rounds, and finalists from API</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,8 +111,8 @@ export default function Home() {
             </div>
             <div className="hidden md:block text-right">
               <div className="font-mono text-xs text-black">
-                <div className="font-bold">{WRITERS.length} WRITERS</div>
-                <div className="opacity-70">{ROUNDS.length} ROUNDS</div>
+                <div className="font-bold">{writers.length} WRITERS</div>
+                <div className="opacity-70">{rounds.length} ROUNDS</div>
               </div>
             </div>
           </div>
@@ -118,7 +160,7 @@ export default function Home() {
 
               <div className="flex items-end">
                 <div className="text-sm font-mono text-black border-2 border-black px-4 py-3 w-full bg-white">
-                  <span className="font-bold">{displayedWriters.length}</span> WRITER{displayedWriters.length !== 1 ? 'S' : ''} × <span className="font-bold">{ROUNDS.length}</span> ROUNDS
+                  <span className="font-bold">{displayedWriters.length}</span> WRITER{displayedWriters.length !== 1 ? 'S' : ''} × <span className="font-bold">{rounds.length}</span> ROUNDS
                 </div>
               </div>
             </div>
@@ -177,7 +219,7 @@ export default function Home() {
 
         {/* Finalists Section */}
         <FinalistsSection
-          finalists={FINALISTS}
+          finalists={finalists}
           onViewScript={handleViewScript}
           onExportVideo={handleExportVideo}
         />
