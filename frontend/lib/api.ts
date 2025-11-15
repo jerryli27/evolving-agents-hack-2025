@@ -230,3 +230,63 @@ export async function exportVideoFormat(
     throw error;
   }
 }
+
+/**
+ * Generate a real video using Seedance AI (ByteDance)
+ * @param request Seedance video generation request
+ */
+export async function generateVideoWithSeedance(
+  request: {
+    story_id: string;
+    title: string;
+    script: string;
+    prompt?: string;
+    duration?: string;
+    resolution?: string;
+    aspect_ratio?: string;
+    use_lite?: boolean;
+  }
+): Promise<{
+  video_url: string;
+  request_id: string;
+  status: string;
+  metadata?: any;
+}> {
+  if (USE_MOCK_DATA) {
+    console.log('[API] Using mock data for Seedance video generation');
+    // Simulate longer generation time (5 seconds)
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
+    return {
+      video_url: 'https://example.com/mock-video.mp4',
+      request_id: 'mock_' + Date.now(),
+      status: 'completed',
+      metadata: {
+        model: 'mock-model',
+        duration: request.duration || '5',
+        resolution: request.resolution || '1080p',
+        aspect_ratio: request.aspect_ratio || '9:16'
+      }
+    };
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/api/generate-video-seedance`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.detail || `Seedance video generation failed: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('[API] Failed to generate video with Seedance:', error);
+    throw error;
+  }
+}
