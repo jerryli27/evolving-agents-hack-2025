@@ -8,6 +8,11 @@ import { WRITERS, ROUNDS, FINALISTS } from './mockData';
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 const USE_MOCK_DATA = !API_URL || process.env.NEXT_PUBLIC_USE_MOCK === 'true';
 
+// Debug: Log API configuration
+console.log('[API CONFIG] NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
+console.log('[API CONFIG] API_URL:', API_URL);
+console.log('[API CONFIG] USE_MOCK_DATA:', USE_MOCK_DATA);
+
 // Helper function to handle API requests with fallback to mock data
 async function fetchWithFallback<T>(
   endpoint: string,
