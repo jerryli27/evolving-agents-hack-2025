@@ -1,12 +1,12 @@
 """
 Video Export Service - Intelligent Beat Sheet Generation
-Uses Claude AI to analyze scripts and generate professional video blueprints
+Uses OpenAI GPT-4 to analyze scripts and generate professional video blueprints
 """
 
 import os
 import json
 from typing import List, Dict, Any, Optional
-from anthropic import Anthropic
+from openai import OpenAI
 from pydantic import BaseModel, Field
 
 
@@ -39,14 +39,14 @@ class VideoExportService:
     """Service for generating video blueprints from story scripts"""
 
     def __init__(self, api_key: Optional[str] = None):
-        """Initialize with Anthropic API key"""
-        self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
+        """Initialize with OpenAI API key"""
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         if not self.api_key:
-            raise ValueError("ANTHROPIC_API_KEY environment variable is required")
-        self.client = Anthropic(api_key=self.api_key)
+            raise ValueError("OPENAI_API_KEY environment variable is required")
+        self.client = OpenAI(api_key=self.api_key)
 
     def extract_characters(self, script: str) -> List[str]:
-        """Extract character names from script using Claude"""
+        """Extract character names from script using GPT-4"""
         prompt = f"""Analyze this script and extract all character names. Return ONLY a JSON array of character names, nothing else.
 
 Script:
@@ -55,13 +55,14 @@ Script:
 Return format: ["Character 1", "Character 2", ...]"""
 
         try:
-            message = self.client.messages.create(
-                model="claude-sonnet-4-5-20250929",
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
                 max_tokens=500,
-                messages=[{"role": "user", "content": prompt}]
+                temperature=0.3
             )
 
-            response_text = message.content[0].text.strip()
+            response_text = response.choices[0].message.content.strip()
             # Try to parse as JSON
             characters = json.loads(response_text)
             return characters if isinstance(characters, list) else ["Main Character"]
@@ -77,7 +78,7 @@ Return format: ["Character 1", "Character 2", ...]"""
         visual_style: str,
         characters: List[str]
     ) -> List[VideoBeatSheet]:
-        """Generate intelligent beat sheet using Claude"""
+        """Generate intelligent beat sheet using GPT-4"""
 
         # Determine number of beats based on video length
         num_beats = max(3, min(8, target_length // 15))
@@ -118,13 +119,14 @@ Example format:
 ]"""
 
         try:
-            message = self.client.messages.create(
-                model="claude-sonnet-4-5-20250929",
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
                 max_tokens=2000,
-                messages=[{"role": "user", "content": prompt}]
+                temperature=0.7
             )
 
-            response_text = message.content[0].text.strip()
+            response_text = response.choices[0].message.content.strip()
 
             # Remove markdown code blocks if present
             if response_text.startswith("```"):
@@ -186,13 +188,14 @@ Script:
 Return only JSON, no markdown:"""
 
         try:
-            message = self.client.messages.create(
-                model="claude-sonnet-4-5-20250929",
+            response = self.client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{"role": "user", "content": prompt}],
                 max_tokens=300,
-                messages=[{"role": "user", "content": prompt}]
+                temperature=0.5
             )
 
-            response_text = message.content[0].text.strip()
+            response_text = response.choices[0].message.content.strip()
 
             # Remove markdown if present
             if response_text.startswith("```"):
