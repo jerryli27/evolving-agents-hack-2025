@@ -54,7 +54,6 @@ class ReaderMarket():
         print(f"{len(self.reader_agents)} reader agents have been added. ")
         print("----------")
 
-
     def get_reader_feedback(self, title: str,
         full_story_summary: str,
         episode_story: str,
@@ -65,15 +64,15 @@ class ReaderMarket():
         for agent in agents:
             print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} is scrolling through episode {timestep} of the short drama series {title}...")
             # First, check if the story is worth reading at all
-            question = {reading_decision_prompt.format(title = title, full_story_summary = full_story_summary, summary = episode_summary, timestep = timestep): ['yes', 'no']}
-            response = agent.categorical_resp(question)
-            print(f"reasoning: {response['reasonings'][0]}")
-            if response['responses'][0] == 'no':
-                print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} decided to NOT to watch episode {timestep} of {title}.")
-                agent.remember(f"Came across a short drama series titled {title} with the following summary of episode {timestep}: {episode_summary}. Decided to not watch it.", time_step=timestep)
-                continue
-            else:
-                print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} decided to watch episode {timestep} of {title}.")
+            #question = {reading_decision_prompt.format(title = title, full_story_summary = full_story_summary, summary = episode_summary, timestep = timestep): ['yes', 'no']}
+            #response = agent.categorical_resp(question)
+            #print(f"reasoning: {response['reasonings'][0]}")
+            #if response['responses'][0] == 'no':
+            #    print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} decided to NOT to watch episode {timestep} of {title}.")
+            #    agent.remember(f"Came across a short drama series titled {title} with the following summary of episode {timestep}: {episode_summary}. Decided to not watch it.", time_step=timestep)
+            #    continue
+            #else:
+            print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} decided to watch episode {timestep} of {title}.")
             agent.remember(f"Came across a short drama series titled {title} with the following summary of episode {timestep}: {episode_summary}. Decided to watch it. The episode presents the following plot: {episode_story}", time_step=timestep)
             
             # Ask about relevance questions
