@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Finalist, VideoBlueprint, ExportFormat } from '@/types';
-import { generateVideoBlueprint, exportVideoFormat } from '@/lib/api';
+import { generateVideoBlueprint, exportVideoFormat, generateVideoWithSeedance } from '@/lib/api';
 
 interface ExportVideoModalProps {
   finalist: Finalist;
@@ -23,6 +23,8 @@ export default function ExportVideoModal({ finalist, onClose }: ExportVideoModal
   const [isGeneratingVideo, setIsGeneratingVideo] = useState(false);
   const [videoGenerated, setVideoGenerated] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   // Generate blueprint on mount or when settings change
   useEffect(() => {
@@ -86,29 +88,50 @@ export default function ExportVideoModal({ finalist, onClose }: ExportVideoModal
     }
   };
 
-  // Mock video generation
+  // Real Seedance video generation
   const handleGenerateVideo = async () => {
     setIsGeneratingVideo(true);
     setVideoProgress(0);
+    setVideoError(null);
+    setVideoUrl(null);
 
-    // Simulate progress
-    const progressInterval = setInterval(() => {
-      setVideoProgress((prev) => {
-        if (prev >= 95) {
-          clearInterval(progressInterval);
-          return 95;
-        }
-        return prev + 5;
+    try {
+      console.log('[MODAL] Starting Seedance video generation...');
+
+      // Start progress simulation
+      const progressInterval = setInterval(() => {
+        setVideoProgress((prev) => {
+          if (prev >= 90) {
+            return 90; // Hold at 90% until we get the result
+          }
+          return prev + 10;
+        });
+      }, 1000);
+
+      // Call Seedance API with story script
+      const result = await generateVideoWithSeedance({
+        story_id: finalist.story.story_id,
+        title: finalist.story.title,
+        script: finalist.story.full_script,
+        duration: String(Math.min(10, Math.floor(videoLength / 6))), // Map 60s -> 10s max
+        resolution: '1080p',
+        aspect_ratio: aspectRatio,
+        use_lite: false // Use Pro model for best quality
       });
-    }, 150);
 
-    // Simulate 3 second generation
-    await new Promise(resolve => setTimeout(resolve, 3000));
+      clearInterval(progressInterval);
+      setVideoProgress(100);
 
-    clearInterval(progressInterval);
-    setVideoProgress(100);
-    setVideoGenerated(true);
-    setIsGeneratingVideo(false);
+      console.log('[MODAL] Video generated successfully:', result);
+
+      setVideoUrl(result.video_url);
+      setVideoGenerated(true);
+    } catch (err) {
+      console.error('[MODAL] Video generation error:', err);
+      setVideoError(err instanceof Error ? err.message : 'Failed to generate video');
+    } finally {
+      setIsGeneratingVideo(false);
+    }
   };
 
   const visualStyles = [
@@ -325,12 +348,12 @@ export default function ExportVideoModal({ finalist, onClose }: ExportVideoModal
               Generate Video
             </h3>
 
-            {!videoGenerated && !isGeneratingVideo && (
+            {!videoGenerated && !isGeneratingVideo && !videoError && (
               <button
                 onClick={handleGenerateVideo}
                 className="w-full py-4 px-6 bg-black text-white border-2 border-black hover:bg-gray-900 hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 font-bold text-sm uppercase tracking-wide transition-all"
               >
-                🎬 Generate Video Preview (Demo)
+                🎬 Generate Video with Seedance AI
               </button>
             )}
 
@@ -357,26 +380,56 @@ export default function ExportVideoModal({ finalist, onClose }: ExportVideoModal
               </div>
             )}
 
-            {videoGenerated && (
+            {videoError && (
               <div className="bg-white border-2 border-black p-4">
-                <div className="mb-3 text-xs uppercase text-black opacity-60">
-                  ✓ Video Generated Successfully
+                <div className="mb-3 text-xs uppercase text-red-600 font-bold">
+                  ✗ Video Generation Failed
                 </div>
-                <div className="bg-black aspect-[9/16] max-w-sm mx-auto flex items-center justify-center">
-                  <div className="text-center text-white p-8">
-                    <div className="text-4xl mb-4">🎬</div>
-                    <div className="text-sm font-mono mb-2">MOCK VIDEO</div>
-                    <div className="text-xs opacity-70 mb-4">
-                      {finalist.story.title}
-                    </div>
-                    <div className="text-xs opacity-50">
-                      In production, this would show your<br />
-                      AI-generated video from Runway/Pika
-                    </div>
-                  </div>
+                <div className="text-sm text-red-600 font-mono">
+                  {videoError}
                 </div>
-                <div className="mt-4 text-xs text-black opacity-60 text-center">
-                  Demo preview • Real video generation available with Runway Gen-3 API
+                <button
+                  onClick={handleGenerateVideo}
+                  className="mt-4 w-full py-2 px-4 bg-black text-white border-2 border-black hover:bg-gray-900 font-bold text-xs uppercase"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {videoGenerated && videoUrl && !videoError && (
+              <div className="bg-white border-2 border-black p-4">
+                <div className="mb-3 text-xs uppercase text-green-600 font-bold">
+                  ✓ Video Generated Successfully with Seedance AI
+                </div>
+                <div className="bg-black aspect-[9/16] max-w-sm mx-auto overflow-hidden">
+                  <video
+                    src={videoUrl}
+                    controls
+                    autoPlay
+                    loop
+                    className="w-full h-full object-cover"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                </div>
+                <div className="mt-4 text-xs text-black opacity-60 text-center font-mono">
+                  Generated by ByteDance Seedance 1.0 Pro • {aspectRatio} • 1080p
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <a
+                    href={videoUrl}
+                    download={`${finalist.story.title.replace(/[^a-zA-Z0-9]/g, '_')}_seedance.mp4`}
+                    className="flex-1 py-2 px-4 bg-black text-white border-2 border-black hover:bg-gray-900 font-bold text-xs uppercase text-center"
+                  >
+                    ⬇ Download Video
+                  </a>
+                  <button
+                    onClick={handleGenerateVideo}
+                    className="flex-1 py-2 px-4 bg-white text-black border-2 border-black hover:bg-gray-50 font-bold text-xs uppercase"
+                  >
+                    🔄 Generate New
+                  </button>
                 </div>
               </div>
             )}
