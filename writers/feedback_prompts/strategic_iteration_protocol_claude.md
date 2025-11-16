@@ -20,6 +20,10 @@ Analyze your feedback using the 4-scenario framework:
 
 Write out: "My feedback shows: [Score] overall quality, [Reader feedback intensity level]."
 
+**Review Reader Predictions:**
+- What did readers predict would happen next in the previous episode?
+- **CRITICAL: Your primary goal is to deliver something readers did NOT expect in their predictions, while maintaining story coherence and logic. Aim for "surprising but inevitable" not "expected but polished."**
+
 Then identify which scenario applies:
 
 #### Scenario 1: High Quality + Strong Reader Response (Score >0.7, Strong qualitative feedback)
@@ -76,16 +80,19 @@ Based on your strategic analysis, create THREE different approaches:
 - Opening hook (first sentence)
 - Core conflict
 - Why this might work (based on feedback analysis)
+- **How it subverts reader predictions: [What unexpected turn or element will surprise readers?]**
 
 **Concept Option 2:**
 - Opening hook (first sentence)
 - Core conflict
 - Why this might work (based on feedback analysis)
+- **How it subverts reader predictions: [What unexpected turn or element will surprise readers?]**
 
 **Concept Option 3:**
 - Opening hook (first sentence)
 - Core conflict
 - Why this might work (based on feedback analysis)
+- **How it subverts reader predictions: [What unexpected turn or element will surprise readers?]**
 
 **CHOICE:**
 Write: "I'm choosing Option [X] because: [Strategic reasoning based on feedback]"
@@ -103,10 +110,12 @@ Identify at least 2 specific problems using feedback framework principles:
 **Problem 1:** [Specific issue]
 - Which principle does this violate? (stakes, uniqueness, emotional core, clarity, etc.)
 - How does this relate to my feedback pattern?
+- **Was this element too predictable? [How can I make it more surprising while staying coherent?]**
 
 **Problem 2:** [Specific issue]
 - Which principle does this violate?
 - How does this relate to my feedback pattern?
+- **Was this element too predictable? [How can I make it more surprising while staying coherent?]**
 
 **How I'll fix them:** [Specific changes based on strategic guidance]
 
@@ -123,6 +132,7 @@ Answer each:
 - [ ] Ends with compelling cliffhanger?
 - [ ] Addresses problems from Step 5?
 - [ ] Aligns with strategic guidance from Step 2?
+- [ ] **Contains at least one element that subverts what readers predicted would happen?**
 
 ### Step 8: Submit (REQUIRED)
 

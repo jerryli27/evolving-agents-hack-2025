@@ -28,6 +28,8 @@ Write out your analysis for each category:
 #### Emotional Signals:
 - Novelty score: [X] → What this means: [readers found it fresh/predictable]
 - Relevance score: [X] → What this means: [readers connected/didn't connect]
+- Reader predictions: [What did readers expect to happen next?]
+- **CRITICAL: Your goal is to SUBVERT reader predictions while maintaining story coherence. Readers should think "I didn't see that coming!" not "I knew exactly what would happen."**
 
 #### Craft/Technical Issues:
 - Quality score: [X] → What this means: [execution was strong/weak]
@@ -67,16 +69,19 @@ Based on your root cause analysis and improvement target, create THREE different
 - Opening hook (first sentence)
 - How it addresses the root cause: [specific explanation]
 - How it improves the target axis: [specific explanation]
+- **How it subverts reader predictions: [What unexpected element will surprise readers?]**
 
 **Concept Option 2:**
 - Opening hook (first sentence)
 - How it addresses the root cause: [specific explanation]
 - How it improves the target axis: [specific explanation]
+- **How it subverts reader predictions: [What unexpected element will surprise readers?]**
 
 **Concept Option 3:**
 - Opening hook (first sentence)
 - How it addresses the root cause: [specific explanation]
 - How it improves the target axis: [specific explanation]
+- **How it subverts reader predictions: [What unexpected element will surprise readers?]**
 
 **CHOICE:**
 Write: "I'm choosing Option [X] because it most effectively addresses [root cause] by [specific reasoning]"
@@ -116,6 +121,7 @@ Answer each:
 - [ ] Scope limited to ONE character, ONE moment, ONE emotional focus?
 - [ ] Problems from Step 5 fixed?
 - [ ] Target improvement axis strengthened?
+- [ ] **Story contains at least one unexpected element that subverts what readers predicted would happen?**
 
 ### Step 8: Submit (REQUIRED)
 

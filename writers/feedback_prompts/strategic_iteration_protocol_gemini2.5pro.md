@@ -34,6 +34,8 @@ Write out explicitly:
 - Novelty Score: [X]/1.00
 - Relevance Score: [X]/1.00
 - Quality Score: [X]/1.00
+- Reader Predictions: [What did readers predict would happen next?]
+- **CRITICAL DIRECTIVE: Your primary objective is to SUBVERT reader predictions while maintaining narrative coherence. Optimize for "unpredicted but logical" outcomes, not "expected but well-executed" outcomes.**
 
 **Matrix Classification:**
 
@@ -89,14 +91,17 @@ Generate 3 intentionally diverse concepts testing different variables:
 **Concept 1:** [Genre/Theme/Stakes combination]
 - Test variable: [What specific element is being tested?]
 - Expected quadrant outcome: [Hypothesis]
+- **Prediction subversion strategy: [How will this concept defy reader expectations?]**
 
 **Concept 2:** [Different Genre/Theme/Stakes]
 - Test variable: [What specific element is being tested?]
 - Expected quadrant outcome: [Hypothesis]
+- **Prediction subversion strategy: [How will this concept defy reader expectations?]**
 
 **Concept 3:** [Different Genre/Theme/Stakes]
 - Test variable: [What specific element is being tested?]
 - Expected quadrant outcome: [Hypothesis]
+- **Prediction subversion strategy: [How will this concept defy reader expectations?]**
 
 #### If REFINEMENT Phase:
 Generate 3 focused iterations of proven "Crowd-Pleaser" concept, testing single variables:
@@ -106,14 +111,17 @@ Generate 3 focused iterations of proven "Crowd-Pleaser" concept, testing single 
 **Iteration 1:** Same concept + [ONE variable change]
 - Variable being tested: [Stakes / Tone / Setting / Character / etc.]
 - Hypothesis: [How this will increase "Money" signal]
+- **Prediction subversion strategy: [How will this iteration surprise readers?]**
 
 **Iteration 2:** Same concept + [DIFFERENT variable change]
 - Variable being tested: [Stakes / Tone / Setting / Character / etc.]
 - Hypothesis: [How this will increase "Money" signal]
+- **Prediction subversion strategy: [How will this iteration surprise readers?]**
 
 **Iteration 3:** Same concept + [DIFFERENT variable change]
 - Variable being tested: [Stakes / Tone / Setting / Character / etc.]
 - Hypothesis: [How this will increase "Money" signal]
+- **Prediction subversion strategy: [How will this iteration surprise readers?]**
 
 #### If OPTIMIZATION Phase:
 Generate 3 minor variations of proven "Winner" for A/B testing:
@@ -122,12 +130,15 @@ Generate 3 minor variations of proven "Winner" for A/B testing:
 
 **Variation 1:** Same winner + [Minor packaging change]
 - Test: [Title / Character demographics / Framing / etc.]
+- **Prediction subversion strategy: [How will this variation surprise readers?]**
 
 **Variation 2:** Same winner + [Minor element enhancement]
 - Test: [Stakes intensification / Emotional beat / Twist timing / etc.]
+- **Prediction subversion strategy: [How will this variation surprise readers?]**
 
 **Variation 3:** Same winner + [Hybridization attempt]
 - Test: [Combine with high-value element from Niche Hit]
+- **Prediction subversion strategy: [How will this variation surprise readers?]**
 
 **SELECTION:**
 Write: "SELECTED CONCEPT: [Number] because it [strategic reasoning based on matrix classification and phase strategy]"
@@ -146,11 +157,13 @@ Evaluate draft against matrix optimization criteria:
 - Impact on "Engagement" signal: [How this reduces broad appeal]
 - Impact on "Impact" signal: [How this reduces reader connection depth]
 - Optimization target: [Which signal this fix prioritizes]
+- **Did this element feel too predictable? [How can the fix add unexpected elements?]**
 
 **Problem 2:** [Specific weakness]
 - Impact on "Engagement" signal: [How this reduces broad appeal]
 - Impact on "Impact" signal: [How this reduces reader connection depth]
 - Optimization target: [Which signal this fix prioritizes]
+- **Did this element feel too predictable? [How can the fix add unexpected elements?]**
 
 **Fix Prioritization:** [Based on current phase and quadrant directive, which problem fix is higher priority?]
 
@@ -167,6 +180,7 @@ Verify against criteria:
 - [ ] Scope constraint: Single character/moment/focus
 - [ ] Matrix alignment: Fixes target correct signal (Engagement/Impact) based on quadrant
 - [ ] Phase alignment: Approach matches exploration/refinement/optimization strategy
+- [ ] **Prediction subversion: Story contains at least one element that defies reader predictions while maintaining logical coherence?**
 
 ### Step 8: Submission (REQUIRED)
 
