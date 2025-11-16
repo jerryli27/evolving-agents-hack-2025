@@ -29,7 +29,6 @@ open_ended_feedback = [
 # Prompts 
 reading_decision_prompt = """
 You just got off work. You are tierd and relaxing on the couch. You are scrolling through a list of short drama episode to watch. You saw episode {timestep} of the series {title}. The full story of {title} is summaeized as: {full_story_summary}.
-You just got off work. You are tierd and relaxing on the couch. You are scrolling through a list of short drama episode to watch. You saw episode {timestep} of the series {title}. The full story of {title} is summaeized as: {full_story_summary}.
 This episode presents the following plot: {summary}.
 Would you be interested to watch? Note that you are busy and you have limited time and attention. Only shows that really stand out will be worth your time. 
 """

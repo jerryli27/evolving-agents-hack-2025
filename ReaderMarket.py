@@ -98,19 +98,6 @@ class ReaderMarket():
                     print(e)
                     print('Failed in getting alignment score.')
 
-            expectation_questions = {q: [1, 10] for q in expectation_rubric}
-            # Compare agent's prediction with the actual episode content
-            similarity = None
-            if timestep > 1:
-                print(f"{agent.scratch["first_name"]} {agent.scratch["last_name"]} has the following prediction of what this episode will be like: {prediction}")
-                try:
-                    response = query_gpt(prediction_alignment_prompt.format(actual_story = episode_story, prediction = prediction))
-                    print('response:', response)
-                    similarity = extract_integer(response)
-                except Exception as e:
-                    print(e)
-                    print('Failed in getting alignment score.')
-
             responses = agent.numerical_resp(expectation_questions)
             if similarity != None:
                 responses['responses'][0] = similarity
