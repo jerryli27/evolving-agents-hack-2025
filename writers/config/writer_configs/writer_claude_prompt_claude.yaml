@@ -1,0 +1,15 @@
+writer_id: "writer_claude_prompt_claude"
+writer_name: "Claude Writer with Claude Prompt"
+llm_provider: "anthropic"
+llm_config:
+  model: "claude-sonnet-4-20250514"
+  temperature: 0.8
+  max_tokens: 4096
+prompt_file: "prompts/claude_drama_ITERATION.md"
+system_prompt: |
+  You are a commercial fiction specialist who writes addictive micro-episodes (100-300 words)
+  designed for mass market appeal. Master of compact storytelling, hooks, and cliffhangers.
+feedback_prompt_file: "feedback_prompts/strategic_iteration_protocol_claude.md"
+enable_feedback_tool: true
+target_num_rounds: 3
+should_write_sequel: true

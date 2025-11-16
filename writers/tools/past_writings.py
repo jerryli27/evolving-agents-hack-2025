@@ -56,6 +56,7 @@ class PastWritingsTool:
 
         for writing in writings:
             output.append(f"\n{writing.performance_summary}")
+            output.append(f"\n  Story:\n{writing.submission.full_story}")
             output.append("-" * 60)
 
         # TODO: Add other writers' works if include_other_writers is True
@@ -90,7 +91,7 @@ class PastWritingsTool:
             "description": (
                 "Access your past story submissions and their performance metrics. "
                 "This includes your previous stories, titles, and feedback scores "
-                "(sales percentage, novelty, relevance, quality, and qualitative feedback)."
+                "(total score, novelty, relevance, quality, and qualitative feedback from readers)."
             ),
             "input_schema": {
                 "type": "object",

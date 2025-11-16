@@ -140,7 +140,8 @@ class CompetitionDataLoader:
                     "reader_feedback": {
                         "summary": feedback["aggregated_qualitative_feedback"] if feedback else "",
                         "tags": self._extract_tags(submission["title"], submission.get("short_summary", "")),
-                        "detailed_comments": feedback["aggregated_qualitative_feedback"] if feedback else ""
+                        "detailed_comments": feedback["aggregated_qualitative_feedback"] if feedback else "",
+                        "prediction_for_next_episode": feedback.get("aggregated_prediction_for_next_episode", "") if feedback else ""
                     } if feedback else {}
                 }
 

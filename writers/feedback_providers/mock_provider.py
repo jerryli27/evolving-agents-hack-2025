@@ -19,6 +19,7 @@ class MockFeedbackProvider(FeedbackProvider):
         Args:
             seed: Random seed for reproducibility (optional)
         """
+        self.seed = seed
         if seed is not None:
             random.seed(seed)
 
@@ -30,7 +31,9 @@ class MockFeedbackProvider(FeedbackProvider):
         price: float,
         timestep: int,
         writer_id: str,
-        round_num: int
+        round_num: int,
+        full_story_summary: str = "",
+        episode_summary: str = ""
     ) -> FeedbackResponse:
         """Generate mock feedback with random scores."""
 
@@ -45,6 +48,7 @@ class MockFeedbackProvider(FeedbackProvider):
             aggregated_relevance_score=max(0.0, min(1.0, base_quality + random.uniform(-noise, noise))),
             aggregated_quality_score=max(0.0, min(1.0, base_quality + random.uniform(-noise, noise))),
             aggregated_qualitative_feedback=self._generate_mock_qualitative_feedback(base_quality),
+            aggregated_prediction_for_next_episode=self._generate_mock_prediction(title),
             raw_feedback=[]  # Empty for mock provider
         )
 
@@ -70,3 +74,17 @@ class MockFeedbackProvider(FeedbackProvider):
             ]
 
         return random.choice(templates)
+
+    def _generate_mock_prediction(self, title: str) -> str:
+        """Generate mock prediction for next episode."""
+        predictions = [
+            "The protagonist will face a difficult choice between personal desires and collective good.",
+            "Unexpected revelations about a character's past will change the dynamics.",
+            "A new conflict will emerge, testing established relationships.",
+            "The main character will discover something that challenges their worldview.",
+            "Events will escalate, forcing characters to confront their deepest fears.",
+            "A mysterious element from earlier will become critically important.",
+            "Tensions will rise as hidden motivations come to light.",
+            "The stakes will increase dramatically with an unexpected twist."
+        ]
+        return random.choice(predictions)

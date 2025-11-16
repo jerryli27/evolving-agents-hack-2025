@@ -10,7 +10,7 @@
         "round": 1,
         "short_summary": "After a chance encounter with her doppelg\u00e4nger, a struggling artist makes a fateful decision that will change both their lives forever.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.380016",
+        "submitted_at": "2025-11-15 21:04:56.235645",
         "writer_id": "baseline_002"
       },
       "feedback": {
@@ -20,6 +20,7 @@
         "aggregated_relevance_score": 0.6006193005193772,
         "aggregated_quality_score": 0.7545974433239341,
         "aggregated_qualitative_feedback": "Interesting concept with room for deeper exploration.",
+        "aggregated_prediction_for_next_episode": "Unexpected revelations about a character's past will change the dynamics.",
         "raw_feedback": []
       }
     },
@@ -31,16 +32,17 @@
         "round": 2,
         "short_summary": "Living as Diane, Claire discovers disturbing secrets about the woman whose identity she borrowed, secrets that someone is willing to kill to protect.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.389245",
+        "submitted_at": "2025-11-15 21:04:56.240853",
         "writer_id": "baseline_002"
       },
       "feedback": {
-        "sold_percentage": 0.4685743450344683,
-        "aggregated_total_score": 0.515387628290777,
-        "aggregated_novelty_score": 0.44474388845738094,
-        "aggregated_relevance_score": 0.3784227611677061,
-        "aggregated_quality_score": 0.5032150921923297,
-        "aggregated_qualitative_feedback": "The concept has potential but needs more development.",
+        "sold_percentage": 0.46227813600431633,
+        "aggregated_total_score": 0.3580298261000784,
+        "aggregated_novelty_score": 0.3891476355101457,
+        "aggregated_relevance_score": 0.45016830808239244,
+        "aggregated_quality_score": 0.42694936210822376,
+        "aggregated_qualitative_feedback": "Consider revising the narrative structure for better flow.",
+        "aggregated_prediction_for_next_episode": "Unexpected revelations about a character's past will change the dynamics.",
         "raw_feedback": []
       }
     },
@@ -52,16 +54,17 @@
         "round": 3,
         "short_summary": "The real Diane returns unexpectedly, forcing Claire to confront the life she's stolen and the danger she's brought to both of them.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.399182",
+        "submitted_at": "2025-11-15 21:04:56.247189",
         "writer_id": "baseline_002"
       },
       "feedback": {
-        "sold_percentage": 0.6912289360271486,
-        "aggregated_total_score": 0.6809869729182362,
-        "aggregated_novelty_score": 0.604430250463664,
-        "aggregated_relevance_score": 0.6696650364735709,
-        "aggregated_quality_score": 0.6119713209535196,
-        "aggregated_qualitative_feedback": "Interesting concept with room for deeper exploration.",
+        "sold_percentage": 0.7761564877361311,
+        "aggregated_total_score": 0.7210921880751309,
+        "aggregated_novelty_score": 0.5925129409486953,
+        "aggregated_relevance_score": 0.761585674534249,
+        "aggregated_quality_score": 0.7313341511840432,
+        "aggregated_qualitative_feedback": "Good story with solid execution. Some areas could be improved.",
+        "aggregated_prediction_for_next_episode": "A new conflict will emerge, testing established relationships.",
         "raw_feedback": []
       }
     },
@@ -73,16 +76,17 @@
         "round": 4,
         "short_summary": "On the run and out of options, Claire and Diane devise a desperate plan to turn their identical appearance into a weapon against their pursuers.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.408404",
+        "submitted_at": "2025-11-15 21:04:56.252439",
         "writer_id": "baseline_002"
       },
       "feedback": {
-        "sold_percentage": 0.4554365308314234,
-        "aggregated_total_score": 0.5396403030842384,
-        "aggregated_novelty_score": 0.6889015850327714,
-        "aggregated_relevance_score": 0.5424981911871778,
-        "aggregated_quality_score": 0.41691312673637654,
-        "aggregated_qualitative_feedback": "The concept has potential but needs more development.",
+        "sold_percentage": 0.7586865761551511,
+        "aggregated_total_score": 0.7469933892549641,
+        "aggregated_novelty_score": 0.8210975327506415,
+        "aggregated_relevance_score": 0.725523537443338,
+        "aggregated_quality_score": 0.7720532667386609,
+        "aggregated_qualitative_feedback": "Engaging narrative, though pacing could be tightened.",
+        "aggregated_prediction_for_next_episode": "The main character will discover something that challenges their worldview.",
         "raw_feedback": []
       }
     },
@@ -94,16 +98,17 @@
         "round": 5,
         "short_summary": "The final confrontation forces both women to decide who they really are and what price they're willing to pay for survival.",
         "price": 1.0,
-        "submitted_at": "2025-11-15 03:03:54.418590",
+        "submitted_at": "2025-11-15 21:04:56.260653",
         "writer_id": "baseline_002"
       },
       "feedback": {
-        "sold_percentage": 0.961721519037688,
-        "aggregated_total_score": 0.8831328593220686,
-        "aggregated_novelty_score": 0.8854373617033662,
-        "aggregated_relevance_score": 0.7650561061613801,
-        "aggregated_quality_score": 0.920722917391994,
-        "aggregated_qualitative_feedback": "Brilliant storytelling with strong character development.",
+        "sold_percentage": 0.7132118815037812,
+        "aggregated_total_score": 0.7611592395944676,
+        "aggregated_novelty_score": 0.6992092781886955,
+        "aggregated_relevance_score": 0.6586065658978686,
+        "aggregated_quality_score": 0.6121328344249864,
+        "aggregated_qualitative_feedback": "Interesting concept with room for deeper exploration.",
+        "aggregated_prediction_for_next_episode": "Events will escalate, forcing characters to confront their deepest fears.",
         "raw_feedback": []
       }
     }

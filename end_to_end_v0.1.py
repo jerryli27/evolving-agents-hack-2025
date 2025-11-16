@@ -236,10 +236,10 @@ Examples:
     print(f"  Data Directory: {args.data_dir}")
     print()
 
-    # Initialize feedback provider
+    # Initialize feedback provider factory
     if use_mock_readers:
         print("Using MockFeedbackProvider (instant, offline)")
-        feedback_provider = MockFeedbackProvider(seed=42)
+        feedback_provider_factory = lambda: MockFeedbackProvider(seed=42)
     else:
         # Check for OPENAI_API_KEY if ReaderMarket is requested
         openai_key = os.environ.get("OPENAI_API_KEY")
@@ -249,19 +249,22 @@ Examples:
             print("  Or use mock readers: --mock-readers or --mock")
             print()
 
-        print("Initializing ReaderMarket...")
-        print("(This may take a moment to load reader agents)")
+        print("Using ReaderMarketFeedbackProvider")
+        print("(Each writer will get its own ReaderMarket instance with independent reader agents)")
         try:
-            feedback_provider = ReaderMarketFeedbackProvider()
-            print("✓ ReaderMarket initialized")
+            # Test that ReaderMarketFeedbackProvider can be instantiated
+            test_provider = ReaderMarketFeedbackProvider()
+            print("✓ ReaderMarketFeedbackProvider is available")
+            del test_provider  # Clean up test instance
+            feedback_provider_factory = ReaderMarketFeedbackProvider
         except Exception as e:
-            print(f"✗ Error initializing ReaderMarket: {e}")
+            print(f"✗ Error testing ReaderMarketFeedbackProvider: {e}")
             print("\nFalling back to MockFeedbackProvider")
             print("To use ReaderMarket, ensure:")
             print("  1. genagents is installed")
             print("  2. Reader agents are available")
             print("  3. OPENAI_API_KEY is set")
-            feedback_provider = MockFeedbackProvider(seed=42)
+            feedback_provider_factory = lambda: MockFeedbackProvider(seed=42)
 
     print()
 
@@ -293,7 +296,7 @@ Examples:
         config_dir="writers/config/writer_configs",
         baseline_config_dir="writers/config/baseline_writers",
         data_dir=args.data_dir,
-        feedback_provider=feedback_provider
+        feedback_provider_factory=feedback_provider_factory
     )
 
     # Load writers
@@ -301,11 +304,24 @@ Examples:
 
     if args.writers:
         # Load specific writers
+        import yaml
+        from pathlib import Path
+        
         for writer_file in args.writers:
             try:
-                api_key = os.environ.get("ANTHROPIC_API_KEY")
+                # Determine which API key to use based on the provider in the config
+                config_path = Path("writers/config/writer_configs") / writer_file
+                with open(config_path, 'r') as f:
+                    config_data = yaml.safe_load(f)
+                
+                provider = config_data.get('llm_provider', 'anthropic').lower()
+                if provider == 'openai':
+                    api_key = os.environ.get("OPENAI_API_KEY")
+                else:  # anthropic or default
+                    api_key = os.environ.get("ANTHROPIC_API_KEY")
+                
                 orchestrator.load_writer(writer_file, api_key=api_key, is_baseline=False)
-                print(f"  ✓ Loaded: {writer_file}")
+                print(f"  ✓ Loaded: {writer_file} (provider: {provider})")
             except Exception as e:
                 print(f"  ✗ Failed to load {writer_file}: {e}")
     else:
@@ -408,6 +424,10 @@ Examples:
     print_banner("SIMULATION COMPLETE")
     print(f"Data saved to: {args.data_dir}/")
     print(f"Writer histories: {args.data_dir}/*.json")
+    print(f"Debug transcripts: {args.data_dir}/debug/transcripts/")
+    print()
+    print(f"To view transcripts:")
+    print(f"  python writers/view_transcript.py view {args.data_dir}/debug/transcripts/writer_XXX/round_X_success_TIMESTAMP.json")
     print()
 
 

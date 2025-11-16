@@ -66,7 +66,9 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         price: float,
         timestep: int,
         writer_id: str,
-        round_num: int
+        round_num: int,
+        full_story_summary: str = "",
+        episode_summary: str = ""
     ) -> FeedbackResponse:
         """
         Get feedback from ReaderMarket generative agents.
@@ -77,11 +79,16 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         """
         self._ensure_initialized()
 
+        # Use the new parameters if provided, otherwise fall back to short_summary for backward compatibility
+        _full_story_summary = full_story_summary if full_story_summary else short_summary
+        _episode_summary = episode_summary if episode_summary else short_summary
+
         # Get feedback from ReaderMarket
         aggregated_feedback = self._reader_market.get_reader_feedback(
             title=title,
-            full_story=full_story,
-            short_summary=short_summary,
+            full_story_summary=_full_story_summary,
+            episode_story=full_story,
+            episode_summary=_episode_summary,
             timestep=timestep,
             price=price
         )
@@ -90,9 +97,13 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         raw_feedback = []
         for feedback in aggregated_feedback.get('raw_feedback', []):
             reader_feedback = ReaderFeedback(
-                reader_id=f"{feedback['reader_agent'].scratch.get('first_name', '')} {feedback['reader_agent'].scratch.get('last_name', '')}",
-                rating=feedback['total_score'],
-                comment=feedback['qualitative_feedback']
+                reader_id=feedback['reader_agent'],
+                total_score=feedback['total_score'],
+                novelty=feedback['novelty'],
+                relevance=feedback['relevance'],
+                quality=feedback['quality'],
+                qualitative_feedback=feedback['qualitative_feedback'],
+                prediction_for_next_episode=feedback.get('prediction_for_next_episode', '')
             )
             raw_feedback.append(reader_feedback)
 
@@ -104,6 +115,7 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
             aggregated_relevance_score=aggregated_feedback['aggregated_relevance_score'],
             aggregated_quality_score=aggregated_feedback['aggregated_quality_score'],
             aggregated_qualitative_feedback=self._format_qualitative_feedback(aggregated_feedback['raw_feedback']),
+            aggregated_prediction_for_next_episode=aggregated_feedback.get('aggregated_prediction_for_next_episode', ''),
             raw_feedback=raw_feedback
         )
 
@@ -123,7 +135,7 @@ class ReaderMarketFeedbackProvider(FeedbackProvider):
         # Collect all feedback
         all_feedback = []
         for feedback in raw_feedback_list:
-            reader_name = f"{feedback['reader_agent'].scratch.get('first_name', '')} {feedback['reader_agent'].scratch.get('last_name', '')}"
+            reader_name = feedback['reader_agent']
             all_feedback.append(f"{reader_name}: {feedback['qualitative_feedback']}")
 
         # Return first few as a sample, or all if there are only a few

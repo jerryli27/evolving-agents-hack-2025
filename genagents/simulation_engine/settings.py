@@ -1,7 +1,11 @@
 from pathlib import Path
+import os
 
-OPENAI_API_KEY = "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"
-KEY_OWNER = "Yi"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise ValueError("OPENAI_API_KEY is not set")
+
+KEY_OWNER = "Jerry"
 
 DEBUG = False
 
